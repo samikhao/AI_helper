@@ -1,0 +1,5036 @@
+{
+	"name": "Integration Telegram Bot, HTTP, Google Sheets",
+	"flow": [
+		{
+			"id": 1,
+			"module": "telegram:WatchUpdates",
+			"version": 1,
+			"parameters": {
+				"__IMTHOOK__": 2212532
+			},
+			"mapper": {},
+			"metadata": {
+				"designer": {
+					"x": 521,
+					"y": 4
+				},
+				"restore": {
+					"parameters": {
+						"__IMTHOOK__": {
+							"data": {
+								"editable": "false"
+							},
+							"label": "My Telegram Bot Updates webhook"
+						}
+					}
+				},
+				"parameters": [
+					{
+						"name": "__IMTHOOK__",
+						"type": "hook:telegramapi",
+						"label": "Webhook",
+						"required": true
+					}
+				]
+			}
+		},
+		{
+			"id": 16,
+			"module": "telegram:DownloadFile",
+			"version": 1,
+			"parameters": {
+				"__IMTCONN__": 4011477
+			},
+			"mapper": {
+				"fileId": "{{1.message.document.file_id}}"
+			},
+			"metadata": {
+				"designer": {
+					"x": 838,
+					"y": 7
+				},
+				"restore": {
+					"parameters": {
+						"__IMTCONN__": {
+							"data": {
+								"scoped": "true",
+								"connection": "telegram"
+							},
+							"label": "My Telegram Bot connection"
+						}
+					}
+				},
+				"parameters": [
+					{
+						"name": "__IMTCONN__",
+						"type": "account:telegram",
+						"label": "Connection",
+						"required": true
+					}
+				],
+				"expect": [
+					{
+						"name": "fileId",
+						"type": "text",
+						"label": "File ID",
+						"required": true
+					}
+				]
+			}
+		},
+		{
+			"id": 31,
+			"module": "builtin:BasicRouter",
+			"version": 1,
+			"mapper": null,
+			"metadata": {
+				"designer": {
+					"x": 1255,
+					"y": -23
+				}
+			},
+			"routes": [
+				{
+					"flow": [
+						{
+							"id": 17,
+							"module": "cloudconvert:ConvertFile",
+							"version": 2,
+							"parameters": {
+								"__IMTCONN__": 4048861
+							},
+							"filter": {
+								"name": "",
+								"conditions": [
+									[
+										{
+											"a": "{{1.message.document.file_name}}",
+											"b": "txt",
+											"o": "text:notendwith"
+										}
+									]
+								]
+							},
+							"mapper": {
+								"export": {
+									"downloadFile": false
+								},
+								"import": {
+									"data": "{{16.fileOutput}}",
+									"filename": "{{16.fileName}}",
+									"importType": "upload"
+								},
+								"options": {
+									"filename": "output.txt",
+									"useInputType": "no",
+									"output_format": "txt"
+								}
+							},
+							"metadata": {
+								"designer": {
+									"x": 1849,
+									"y": -291
+								},
+								"restore": {
+									"expect": {
+										"export": {
+											"nested": {
+												"downloadFile": {
+													"mode": "chose"
+												}
+											}
+										},
+										"import": {
+											"nested": {
+												"importType": {
+													"label": "upload a file"
+												}
+											}
+										},
+										"options": {
+											"nested": {
+												"opts": {
+													"mode": "chose"
+												},
+												"useInputType": {
+													"mode": "chose",
+													"label": "I don't know the input format"
+												},
+												"output_format": {
+													"mode": "chose",
+													"label": "txt"
+												}
+											}
+										}
+									},
+									"parameters": {
+										"__IMTCONN__": {
+											"data": {
+												"scoped": "true",
+												"connection": "cloudconvert3"
+											},
+											"label": "egor_sinizinn_key"
+										}
+									}
+								},
+								"parameters": [
+									{
+										"name": "__IMTCONN__",
+										"type": "account:cloudconvert3,cloudconvert2",
+										"label": "Connection",
+										"required": true
+									}
+								],
+								"expect": [
+									{
+										"name": "import",
+										"spec": [
+											{
+												"name": "importType",
+												"type": "select",
+												"label": "Input file",
+												"required": true,
+												"validate": {
+													"enum": ["upload", "url"]
+												}
+											},
+											{
+												"name": "data",
+												"type": "buffer",
+												"label": "Data",
+												"required": true
+											},
+											{
+												"name": "filename",
+												"type": "filename",
+												"label": "File name",
+												"required": true
+											}
+										],
+										"type": "collection",
+										"label": "Import options",
+										"required": true
+									},
+									{
+										"name": "options",
+										"spec": [
+											{
+												"name": "useInputType",
+												"type": "select",
+												"label": "Format",
+												"required": true,
+												"validate": {
+													"enum": ["yes", "no"]
+												}
+											},
+											{
+												"name": "output_format",
+												"type": "select",
+												"label": "Output format",
+												"required": true
+											},
+											{
+												"name": "filename",
+												"type": "filename",
+												"label": "File name",
+												"required": true
+											},
+											{
+												"name": "opts",
+												"spec": [
+													{
+														"name": "name",
+														"type": "text",
+														"label": "Name",
+														"required": true
+													},
+													{
+														"name": "value",
+														"type": "text",
+														"label": "Value"
+													}
+												],
+												"type": "array",
+												"label": "Conversion and engine specific options"
+											}
+										],
+										"type": "collection",
+										"label": "Convert options",
+										"required": true
+									},
+									{
+										"name": "export",
+										"spec": [
+											{
+												"name": "downloadFile",
+												"type": "boolean",
+												"label": "Download a file",
+												"required": true
+											}
+										],
+										"type": "collection",
+										"label": "Export options",
+										"required": true
+									},
+									{
+										"name": "import",
+										"spec": [
+											{
+												"name": "importType",
+												"type": "select",
+												"label": "Input file",
+												"required": true,
+												"validate": {
+													"enum": ["upload", "url"]
+												}
+											},
+											{
+												"name": "data",
+												"type": "buffer",
+												"label": "Data",
+												"required": true
+											},
+											{
+												"name": "filename",
+												"type": "filename",
+												"label": "File name",
+												"required": true
+											}
+										],
+										"type": "collection",
+										"label": "Import options",
+										"required": true
+									},
+									{
+										"name": "options",
+										"spec": [
+											{
+												"name": "useInputType",
+												"type": "select",
+												"label": "Format",
+												"required": true,
+												"validate": {
+													"enum": ["yes", "no"]
+												}
+											},
+											{
+												"name": "output_format",
+												"type": "select",
+												"label": "Output format",
+												"required": true
+											},
+											{
+												"name": "filename",
+												"type": "filename",
+												"label": "File name",
+												"required": true
+											},
+											{
+												"name": "opts",
+												"spec": [
+													{
+														"name": "name",
+														"type": "text",
+														"label": "Name",
+														"required": true
+													},
+													{
+														"name": "value",
+														"type": "text",
+														"label": "Value"
+													}
+												],
+												"type": "array",
+												"label": "Conversion and engine specific options"
+											}
+										],
+										"type": "collection",
+										"label": "Convert options",
+										"required": true
+									},
+									{
+										"name": "export",
+										"spec": [
+											{
+												"name": "downloadFile",
+												"type": "boolean",
+												"label": "Download a file",
+												"required": true
+											}
+										],
+										"type": "collection",
+										"label": "Export options",
+										"required": true
+									}
+								]
+							}
+						},
+						{
+							"id": 18,
+							"module": "http:MakeRequest",
+							"version": 4,
+							"parameters": {
+								"tlsType": "",
+								"proxyKeychain": "",
+								"authenticationType": "noAuth"
+							},
+							"mapper": {
+								"url": "{{17.url}}",
+								"method": "get",
+								"shareCookies": false,
+								"parseResponse": true,
+								"allowRedirects": true,
+								"stopOnHttpError": true,
+								"requestCompressedContent": true
+							},
+							"metadata": {
+								"designer": {
+									"x": 2135,
+									"y": -307
+								},
+								"restore": {
+									"expect": {
+										"method": {
+											"mode": "chose",
+											"label": "GET"
+										},
+										"headers": {
+											"mode": "chose"
+										},
+										"contentType": {
+											"label": "Empty"
+										},
+										"shareCookies": {
+											"mode": "chose"
+										},
+										"parseResponse": {
+											"mode": "chose"
+										},
+										"allowRedirects": {
+											"mode": "chose"
+										},
+										"paginationType": {
+											"label": "Empty"
+										},
+										"queryParameters": {
+											"mode": "chose"
+										},
+										"stopOnHttpError": {
+											"mode": "chose"
+										},
+										"requestCompressedContent": {
+											"mode": "chose"
+										}
+									},
+									"parameters": {
+										"tlsType": {
+											"label": "Empty"
+										},
+										"proxyKeychain": {
+											"label": "Choose a key"
+										},
+										"authenticationType": {
+											"label": "No authenticationUse when no credentials are required for the request."
+										}
+									}
+								},
+								"parameters": [
+									{
+										"name": "authenticationType",
+										"type": "select",
+										"label": "Authentication type",
+										"required": true,
+										"validate": {
+											"enum": ["noAuth", "apiKey", "basicAuth", "oAuth"]
+										}
+									},
+									{
+										"name": "tlsType",
+										"type": "select",
+										"label": "Transport layer security (TLS)",
+										"validate": {
+											"enum": ["mTls", "tls"]
+										}
+									},
+									{
+										"name": "proxyKeychain",
+										"type": "keychain:proxy",
+										"label": "Proxy"
+									}
+								],
+								"expect": [
+									{
+										"name": "url",
+										"type": "url",
+										"label": "URL",
+										"required": true
+									},
+									{
+										"name": "method",
+										"type": "select",
+										"label": "Method",
+										"required": true,
+										"validate": {
+											"enum": [
+												"get",
+												"head",
+												"post",
+												"put",
+												"patch",
+												"delete",
+												"options"
+											]
+										}
+									},
+									{
+										"name": "headers",
+										"spec": {
+											"name": "value",
+											"spec": [
+												{
+													"name": "name",
+													"type": "text",
+													"label": "Name",
+													"required": true,
+													"validate": {
+														"pattern": "^[-!#$%&'*+.^_`|~0-9A-Za-z]+$"
+													}
+												},
+												{
+													"name": "value",
+													"type": "text",
+													"label": "Value"
+												}
+											],
+											"type": "collection",
+											"label": "Header"
+										},
+										"type": "array",
+										"label": "Headers"
+									},
+									{
+										"name": "queryParameters",
+										"spec": {
+											"name": "value",
+											"spec": [
+												{
+													"name": "name",
+													"type": "text",
+													"label": "Name",
+													"required": true
+												},
+												{
+													"name": "value",
+													"type": "text",
+													"label": "Value"
+												}
+											],
+											"type": "collection",
+											"label": "Parameter"
+										},
+										"type": "array",
+										"label": "Query parameters"
+									},
+									{
+										"name": "contentType",
+										"type": "select",
+										"label": "Body content type",
+										"validate": {
+											"enum": ["json", "multipart", "urlEncoded", "custom"]
+										}
+									},
+									{
+										"name": "parseResponse",
+										"type": "boolean",
+										"label": "Parse response",
+										"required": true
+									},
+									{
+										"name": "stopOnHttpError",
+										"type": "boolean",
+										"label": "Return error if HTTP request fails",
+										"required": true
+									},
+									{
+										"name": "timeout",
+										"type": "uinteger",
+										"label": "Timeout",
+										"validate": {
+											"max": 300,
+											"min": 1
+										}
+									},
+									{
+										"name": "allowRedirects",
+										"type": "boolean",
+										"label": "Allow redirects",
+										"required": true
+									},
+									{
+										"name": "shareCookies",
+										"type": "boolean",
+										"label": "Share cookies with other HTTP modules",
+										"required": true
+									},
+									{
+										"name": "requestCompressedContent",
+										"type": "boolean",
+										"label": "Request compressed content",
+										"required": true
+									},
+									{
+										"name": "paginationType",
+										"type": "select",
+										"label": "Pagination type",
+										"validate": {
+											"enum": [
+												"offsetBased",
+												"pageBased",
+												"urlBased",
+												"tokenBased"
+											]
+										}
+									}
+								],
+								"interface": [
+									{
+										"name": "data",
+										"type": "any",
+										"label": "Data"
+									},
+									{
+										"name": "statusCode",
+										"type": "number",
+										"label": "Status Code"
+									},
+									{
+										"name": "headers",
+										"spec": [
+											{
+												"name": "content-length",
+												"type": "text",
+												"label": "Content-Length"
+											},
+											{
+												"name": "content-encoding",
+												"type": "text",
+												"label": "Content-Encoding"
+											},
+											{
+												"name": "content-type",
+												"type": "text",
+												"label": "Content-Type"
+											},
+											{
+												"name": "server",
+												"type": "text",
+												"label": "Server"
+											},
+											{
+												"name": "cache-control",
+												"type": "text",
+												"label": "Cache-Control"
+											},
+											{
+												"name": "set-cookie",
+												"spec": {
+													"type": "text"
+												},
+												"type": "array",
+												"label": "Set-Cookie"
+											}
+										],
+										"type": "collection",
+										"label": "Headers"
+									}
+								]
+							}
+						},
+						{
+							"id": 19,
+							"module": "util:ComposeTransformer",
+							"version": 1,
+							"parameters": {},
+							"mapper": {
+								"value": "{{replace(replace(replace(replace(replace(18.data; \"\"\"\\r\\n\"\"\"; \"\"\"\\n\"\"\"); \"\"\"`\\n\"\"\"; \"\"\"\\n\"\"\"); \"\"\"{=tex}\"\"\"; \"\"); \"\"\"`\"\"\"; \"\"); \"\"\"\\n\"\"\"; \"\"\"\\\\n\"\"\")}}"
+							},
+							"metadata": {
+								"designer": {
+									"x": 2447,
+									"y": -307
+								},
+								"restore": {},
+								"expect": [
+									{
+										"name": "value",
+										"type": "text",
+										"label": "Text"
+									}
+								]
+							}
+						},
+						{
+							"id": 10,
+							"module": "http:MakeRequest",
+							"version": 4,
+							"parameters": {
+								"tlsType": "",
+								"proxyKeychain": "",
+								"authenticationType": "noAuth"
+							},
+							"mapper": {
+								"url": "https://ariah-homeliest-nongeographically.ngrok-free.dev/keywords",
+								"method": "post",
+								"headers": [
+									{
+										"name": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"contentType": "json",
+								"inputMethod": "dataStructure",
+								"shareCookies": false,
+								"parseResponse": true,
+								"allowRedirects": true,
+								"stopOnHttpError": true,
+								"bodyDataStructure": 260947,
+								"dataStructureBodyContent": {
+									"text": "{{19.value}}",
+									"max_keywords": "8"
+								},
+								"requestCompressedContent": true
+							},
+							"metadata": {
+								"designer": {
+									"x": 2747,
+									"y": -307
+								},
+								"restore": {
+									"expect": {
+										"method": {
+											"mode": "chose",
+											"label": "POST"
+										},
+										"headers": {
+											"mode": "chose",
+											"items": [null]
+										},
+										"contentType": {
+											"label": "application/jsonEnter data in the JSON format, as a string or using a data structure."
+										},
+										"inputMethod": {
+											"label": "Data structureDefine the JSON body with a data structure to map or enter values for each key. JSON reserved characters are escaped automatically."
+										},
+										"shareCookies": {
+											"mode": "chose"
+										},
+										"parseResponse": {
+											"mode": "chose"
+										},
+										"allowRedirects": {
+											"mode": "chose"
+										},
+										"paginationType": {
+											"label": "Empty"
+										},
+										"queryParameters": {
+											"mode": "chose"
+										},
+										"stopOnHttpError": {
+											"mode": "chose"
+										},
+										"bodyDataStructure": {
+											"label": "My data structure"
+										},
+										"requestCompressedContent": {
+											"mode": "chose"
+										}
+									},
+									"parameters": {
+										"tlsType": {
+											"label": "Empty"
+										},
+										"proxyKeychain": {
+											"label": "Choose a key"
+										},
+										"authenticationType": {
+											"label": "No authenticationUse when no credentials are required for the request."
+										}
+									}
+								},
+								"parameters": [
+									{
+										"name": "authenticationType",
+										"type": "select",
+										"label": "Authentication type",
+										"required": true,
+										"validate": {
+											"enum": ["noAuth", "apiKey", "basicAuth", "oAuth"]
+										}
+									},
+									{
+										"name": "tlsType",
+										"type": "select",
+										"label": "Transport layer security (TLS)",
+										"validate": {
+											"enum": ["mTls", "tls"]
+										}
+									},
+									{
+										"name": "proxyKeychain",
+										"type": "keychain:proxy",
+										"label": "Proxy"
+									}
+								],
+								"expect": [
+									{
+										"name": "url",
+										"type": "url",
+										"label": "URL",
+										"required": true
+									},
+									{
+										"name": "method",
+										"type": "select",
+										"label": "Method",
+										"required": true,
+										"validate": {
+											"enum": [
+												"get",
+												"head",
+												"post",
+												"put",
+												"patch",
+												"delete",
+												"options"
+											]
+										}
+									},
+									{
+										"name": "headers",
+										"spec": {
+											"name": "value",
+											"spec": [
+												{
+													"name": "name",
+													"type": "text",
+													"label": "Name",
+													"required": true,
+													"validate": {
+														"pattern": "^[-!#$%&'*+.^_`|~0-9A-Za-z]+$"
+													}
+												},
+												{
+													"name": "value",
+													"type": "text",
+													"label": "Value"
+												}
+											],
+											"type": "collection",
+											"label": "Header"
+										},
+										"type": "array",
+										"label": "Headers"
+									},
+									{
+										"name": "queryParameters",
+										"spec": {
+											"name": "value",
+											"spec": [
+												{
+													"name": "name",
+													"type": "text",
+													"label": "Name",
+													"required": true
+												},
+												{
+													"name": "value",
+													"type": "text",
+													"label": "Value"
+												}
+											],
+											"type": "collection",
+											"label": "Parameter"
+										},
+										"type": "array",
+										"label": "Query parameters"
+									},
+									{
+										"name": "contentType",
+										"type": "select",
+										"label": "Body content type",
+										"validate": {
+											"enum": ["json", "multipart", "urlEncoded", "custom"]
+										}
+									},
+									{
+										"name": "parseResponse",
+										"type": "boolean",
+										"label": "Parse response",
+										"required": true
+									},
+									{
+										"name": "stopOnHttpError",
+										"type": "boolean",
+										"label": "Return error if HTTP request fails",
+										"required": true
+									},
+									{
+										"name": "timeout",
+										"type": "uinteger",
+										"label": "Timeout",
+										"validate": {
+											"max": 300,
+											"min": 1
+										}
+									},
+									{
+										"name": "allowRedirects",
+										"type": "boolean",
+										"label": "Allow redirects",
+										"required": true
+									},
+									{
+										"name": "shareCookies",
+										"type": "boolean",
+										"label": "Share cookies with other HTTP modules",
+										"required": true
+									},
+									{
+										"name": "requestCompressedContent",
+										"type": "boolean",
+										"label": "Request compressed content",
+										"required": true
+									},
+									{
+										"name": "inputMethod",
+										"type": "select",
+										"label": "Body input method",
+										"required": true,
+										"validate": {
+											"enum": ["dataStructure", "jsonString"]
+										}
+									},
+									{
+										"name": "bodyDataStructure",
+										"type": "udt",
+										"label": "Body structure",
+										"required": true
+									},
+									{
+										"name": "dataStructureBodyContent",
+										"spec": [
+											{
+												"name": "text",
+												"type": "text",
+												"label": "Text"
+											},
+											{
+												"name": "max_keywords",
+												"type": "number",
+												"label": "Max keywords"
+											}
+										],
+										"type": "collection",
+										"label": "Body content"
+									},
+									{
+										"name": "paginationType",
+										"type": "select",
+										"label": "Pagination type",
+										"validate": {
+											"enum": [
+												"offsetBased",
+												"pageBased",
+												"urlBased",
+												"tokenBased"
+											]
+										}
+									}
+								],
+								"interface": [
+									{
+										"name": "data",
+										"type": "any",
+										"label": "Data"
+									},
+									{
+										"name": "statusCode",
+										"type": "number",
+										"label": "Status Code"
+									},
+									{
+										"name": "headers",
+										"spec": [
+											{
+												"name": "content-length",
+												"type": "text",
+												"label": "Content-Length"
+											},
+											{
+												"name": "content-encoding",
+												"type": "text",
+												"label": "Content-Encoding"
+											},
+											{
+												"name": "content-type",
+												"type": "text",
+												"label": "Content-Type"
+											},
+											{
+												"name": "server",
+												"type": "text",
+												"label": "Server"
+											},
+											{
+												"name": "cache-control",
+												"type": "text",
+												"label": "Cache-Control"
+											},
+											{
+												"name": "set-cookie",
+												"spec": {
+													"type": "text"
+												},
+												"type": "array",
+												"label": "Set-Cookie"
+											}
+										],
+										"type": "collection",
+										"label": "Headers"
+									}
+								]
+							}
+						},
+						{
+							"id": 11,
+							"module": "builtin:BasicRouter",
+							"version": 1,
+							"mapper": null,
+							"metadata": {
+								"designer": {
+									"x": 3047,
+									"y": -307
+								}
+							},
+							"routes": [
+								{
+									"flow": [
+										{
+											"id": 2,
+											"module": "http:MakeRequest",
+											"version": 4,
+											"parameters": {
+												"tlsType": "",
+												"proxyKeychain": "",
+												"authenticationType": "noAuth"
+											},
+											"filter": {
+												"name": "",
+												"conditions": [
+													[
+														{
+															"a": "{{10.data.language}}",
+															"b": "ru",
+															"o": "text:equal"
+														}
+													]
+												]
+											},
+											"mapper": {
+												"url": "https://router.huggingface.co/hf-inference/models/cointegrated/rut5-base-absum",
+												"method": "post",
+												"headers": [
+													{
+														"name": "Authorization",
+														"value": "Bearer {YOUR_TOKEN}"
+													},
+													{
+														"name": "Content-Type",
+														"value": "application/json"
+													}
+												],
+												"contentType": "json",
+												"inputMethod": "dataStructure",
+												"shareCookies": false,
+												"parseResponse": true,
+												"allowRedirects": true,
+												"stopOnHttpError": true,
+												"bodyDataStructure": 260948,
+												"dataStructureBodyContent": {
+													"inputs": "{{19.value}}",
+													"options": {
+														"wait_for_model": true
+													},
+													"parameters": {
+														"do_sample": false,
+														"num_beams": "4",
+														"max_length": "300",
+														"min_length": "140",
+														"repetition_penalty": "10.2"
+													}
+												},
+												"requestCompressedContent": true
+											},
+											"metadata": {
+												"designer": {
+													"x": 3385,
+													"y": -486
+												},
+												"restore": {
+													"expect": {
+														"method": {
+															"mode": "chose",
+															"label": "POST"
+														},
+														"headers": {
+															"mode": "chose",
+															"items": [null, null]
+														},
+														"contentType": {
+															"label": "application/jsonEnter data in the JSON format, as a string or using a data structure."
+														},
+														"inputMethod": {
+															"label": "Data structureDefine the JSON body with a data structure to map or enter values for each key. JSON reserved characters are escaped automatically."
+														},
+														"shareCookies": {
+															"mode": "chose"
+														},
+														"parseResponse": {
+															"mode": "chose"
+														},
+														"allowRedirects": {
+															"mode": "chose"
+														},
+														"paginationType": {
+															"label": "Empty"
+														},
+														"queryParameters": {
+															"mode": "chose"
+														},
+														"stopOnHttpError": {
+															"mode": "chose"
+														},
+														"bodyDataStructure": {
+															"label": "ru_summary"
+														},
+														"dataStructureBodyContent": {
+															"nested": {
+																"options": {
+																	"nested": {
+																		"wait_for_model": {
+																			"mode": "chose"
+																		}
+																	}
+																},
+																"parameters": {
+																	"nested": {
+																		"do_sample": {
+																			"mode": "chose"
+																		}
+																	}
+																}
+															}
+														},
+														"requestCompressedContent": {
+															"mode": "chose"
+														}
+													},
+													"parameters": {
+														"tlsType": {
+															"label": "Empty"
+														},
+														"proxyKeychain": {
+															"label": "Choose a key"
+														},
+														"authenticationType": {
+															"label": "No authenticationUse when no credentials are required for the request."
+														}
+													}
+												},
+												"parameters": [
+													{
+														"name": "authenticationType",
+														"type": "select",
+														"label": "Authentication type",
+														"required": true,
+														"validate": {
+															"enum": ["noAuth", "apiKey", "basicAuth", "oAuth"]
+														}
+													},
+													{
+														"name": "tlsType",
+														"type": "select",
+														"label": "Transport layer security (TLS)",
+														"validate": {
+															"enum": ["mTls", "tls"]
+														}
+													},
+													{
+														"name": "proxyKeychain",
+														"type": "keychain:proxy",
+														"label": "Proxy"
+													}
+												],
+												"expect": [
+													{
+														"name": "url",
+														"type": "url",
+														"label": "URL",
+														"required": true
+													},
+													{
+														"name": "method",
+														"type": "select",
+														"label": "Method",
+														"required": true,
+														"validate": {
+															"enum": [
+																"get",
+																"head",
+																"post",
+																"put",
+																"patch",
+																"delete",
+																"options"
+															]
+														}
+													},
+													{
+														"name": "headers",
+														"spec": {
+															"name": "value",
+															"spec": [
+																{
+																	"name": "name",
+																	"type": "text",
+																	"label": "Name",
+																	"required": true,
+																	"validate": {
+																		"pattern": "^[-!#$%&'*+.^_`|~0-9A-Za-z]+$"
+																	}
+																},
+																{
+																	"name": "value",
+																	"type": "text",
+																	"label": "Value"
+																}
+															],
+															"type": "collection",
+															"label": "Header"
+														},
+														"type": "array",
+														"label": "Headers"
+													},
+													{
+														"name": "queryParameters",
+														"spec": {
+															"name": "value",
+															"spec": [
+																{
+																	"name": "name",
+																	"type": "text",
+																	"label": "Name",
+																	"required": true
+																},
+																{
+																	"name": "value",
+																	"type": "text",
+																	"label": "Value"
+																}
+															],
+															"type": "collection",
+															"label": "Parameter"
+														},
+														"type": "array",
+														"label": "Query parameters"
+													},
+													{
+														"name": "contentType",
+														"type": "select",
+														"label": "Body content type",
+														"validate": {
+															"enum": [
+																"json",
+																"multipart",
+																"urlEncoded",
+																"custom"
+															]
+														}
+													},
+													{
+														"name": "parseResponse",
+														"type": "boolean",
+														"label": "Parse response",
+														"required": true
+													},
+													{
+														"name": "stopOnHttpError",
+														"type": "boolean",
+														"label": "Return error if HTTP request fails",
+														"required": true
+													},
+													{
+														"name": "timeout",
+														"type": "uinteger",
+														"label": "Timeout",
+														"validate": {
+															"max": 300,
+															"min": 1
+														}
+													},
+													{
+														"name": "allowRedirects",
+														"type": "boolean",
+														"label": "Allow redirects",
+														"required": true
+													},
+													{
+														"name": "shareCookies",
+														"type": "boolean",
+														"label": "Share cookies with other HTTP modules",
+														"required": true
+													},
+													{
+														"name": "requestCompressedContent",
+														"type": "boolean",
+														"label": "Request compressed content",
+														"required": true
+													},
+													{
+														"name": "inputMethod",
+														"type": "select",
+														"label": "Body input method",
+														"required": true,
+														"validate": {
+															"enum": ["dataStructure", "jsonString"]
+														}
+													},
+													{
+														"name": "bodyDataStructure",
+														"type": "udt",
+														"label": "Body structure",
+														"required": true
+													},
+													{
+														"name": "dataStructureBodyContent",
+														"spec": [
+															{
+																"name": "inputs",
+																"type": "text",
+																"label": "Inputs",
+																"required": true
+															},
+															{
+																"name": "parameters",
+																"spec": [
+																	{
+																		"name": "min_length",
+																		"type": "number",
+																		"label": "Min length"
+																	},
+																	{
+																		"name": "max_length",
+																		"type": "number",
+																		"label": "Max length"
+																	},
+																	{
+																		"name": "num_beams",
+																		"type": "number",
+																		"label": "Num beams"
+																	},
+																	{
+																		"name": "repetition_penalty",
+																		"type": "number",
+																		"label": "Repetition penalty"
+																	},
+																	{
+																		"name": "do_sample",
+																		"type": "boolean",
+																		"label": "Do sample"
+																	}
+																],
+																"type": "collection",
+																"label": "Parameters"
+															},
+															{
+																"name": "options",
+																"spec": [
+																	{
+																		"name": "wait_for_model",
+																		"type": "boolean",
+																		"label": "Wait for model"
+																	}
+																],
+																"type": "collection",
+																"label": "Options"
+															}
+														],
+														"type": "collection",
+														"label": "Body content"
+													},
+													{
+														"name": "paginationType",
+														"type": "select",
+														"label": "Pagination type",
+														"validate": {
+															"enum": [
+																"offsetBased",
+																"pageBased",
+																"urlBased",
+																"tokenBased"
+															]
+														}
+													}
+												],
+												"interface": [
+													{
+														"name": "data",
+														"type": "any",
+														"label": "Data"
+													},
+													{
+														"name": "statusCode",
+														"type": "number",
+														"label": "Status Code"
+													},
+													{
+														"name": "headers",
+														"spec": [
+															{
+																"name": "content-length",
+																"type": "text",
+																"label": "Content-Length"
+															},
+															{
+																"name": "content-encoding",
+																"type": "text",
+																"label": "Content-Encoding"
+															},
+															{
+																"name": "content-type",
+																"type": "text",
+																"label": "Content-Type"
+															},
+															{
+																"name": "server",
+																"type": "text",
+																"label": "Server"
+															},
+															{
+																"name": "cache-control",
+																"type": "text",
+																"label": "Cache-Control"
+															},
+															{
+																"name": "set-cookie",
+																"spec": {
+																	"type": "text"
+																},
+																"type": "array",
+																"label": "Set-Cookie"
+															}
+														],
+														"type": "collection",
+														"label": "Headers"
+													}
+												]
+											}
+										},
+										{
+											"id": 5,
+											"module": "json:ParseJSON",
+											"version": 1,
+											"parameters": {
+												"type": ""
+											},
+											"mapper": {
+												"json": "{{2.data}}"
+											},
+											"metadata": {
+												"designer": {
+													"x": 3809,
+													"y": -490
+												},
+												"restore": {
+													"parameters": {
+														"type": {
+															"label": "Choose a data structure"
+														}
+													}
+												},
+												"parameters": [
+													{
+														"name": "type",
+														"type": "udt",
+														"label": "Data structure"
+													}
+												],
+												"expect": [
+													{
+														"name": "json",
+														"type": "text",
+														"label": "JSON string",
+														"required": true
+													}
+												]
+											}
+										},
+										{
+											"id": 3,
+											"module": "google-sheets:addRow",
+											"version": 2,
+											"parameters": {
+												"__IMTCONN__": 4020739
+											},
+											"mapper": {
+												"from": "drive",
+												"mode": "select",
+												"values": {
+													"0": "{{1.message.date}}",
+													"1": "{{1.message.from.username}}",
+													"2": "{{1.message.document.file_name}}",
+													"3": "{{1.message.document.file_size}}",
+													"4": "{{10.data.language}}",
+													"5": "{{2.data}}",
+													"6": "{{10.data.keywords_str}}"
+												},
+												"sheetId": "Лист1",
+												"spreadsheetId": "/1XAr_r6eQEZpsb4AiEqNjBe-eVlhut4YcHcXkQD-LBmM",
+												"includesHeaders": true,
+												"insertDataOption": "INSERT_ROWS",
+												"valueInputOption": "USER_ENTERED",
+												"insertUnformatted": false
+											},
+											"metadata": {
+												"designer": {
+													"x": 4210,
+													"y": -495
+												},
+												"restore": {
+													"expect": {
+														"from": {
+															"label": "My Drive"
+														},
+														"mode": {
+															"label": "Search by path"
+														},
+														"sheetId": {
+															"label": "Лист1"
+														},
+														"spreadsheetId": {
+															"path": ["vk_database"]
+														},
+														"includesHeaders": {
+															"label": "Yes",
+															"nested": [
+																{
+																	"name": "values",
+																	"spec": [
+																		{
+																			"name": "0",
+																			"type": "text",
+																			"label": "timestamp (A)"
+																		},
+																		{
+																			"name": "1",
+																			"type": "text",
+																			"label": "uploader (B)"
+																		},
+																		{
+																			"name": "2",
+																			"type": "text",
+																			"label": "file_name (C)"
+																		},
+																		{
+																			"name": "3",
+																			"type": "text",
+																			"label": "file_size_bytes (D)"
+																		},
+																		{
+																			"name": "4",
+																			"type": "text",
+																			"label": "language (E)"
+																		},
+																		{
+																			"name": "5",
+																			"type": "text",
+																			"label": "summary (F)"
+																		},
+																		{
+																			"name": "6",
+																			"type": "text",
+																			"label": "keywords (G)"
+																		},
+																		{
+																			"name": "7",
+																			"type": "text",
+																			"label": "(H)"
+																		},
+																		{
+																			"name": "8",
+																			"type": "text",
+																			"label": "(I)"
+																		},
+																		{
+																			"name": "9",
+																			"type": "text",
+																			"label": "(J)"
+																		},
+																		{
+																			"name": "10",
+																			"type": "text",
+																			"label": "(K)"
+																		},
+																		{
+																			"name": "11",
+																			"type": "text",
+																			"label": "(L)"
+																		},
+																		{
+																			"name": "12",
+																			"type": "text",
+																			"label": "(M)"
+																		},
+																		{
+																			"name": "13",
+																			"type": "text",
+																			"label": "(N)"
+																		},
+																		{
+																			"name": "14",
+																			"type": "text",
+																			"label": "(O)"
+																		},
+																		{
+																			"name": "15",
+																			"type": "text",
+																			"label": "(P)"
+																		},
+																		{
+																			"name": "16",
+																			"type": "text",
+																			"label": "(Q)"
+																		},
+																		{
+																			"name": "17",
+																			"type": "text",
+																			"label": "(R)"
+																		},
+																		{
+																			"name": "18",
+																			"type": "text",
+																			"label": "(S)"
+																		},
+																		{
+																			"name": "19",
+																			"type": "text",
+																			"label": "(T)"
+																		},
+																		{
+																			"name": "20",
+																			"type": "text",
+																			"label": "(U)"
+																		},
+																		{
+																			"name": "21",
+																			"type": "text",
+																			"label": "(V)"
+																		},
+																		{
+																			"name": "22",
+																			"type": "text",
+																			"label": "(W)"
+																		},
+																		{
+																			"name": "23",
+																			"type": "text",
+																			"label": "(X)"
+																		},
+																		{
+																			"name": "24",
+																			"type": "text",
+																			"label": "(Y)"
+																		},
+																		{
+																			"name": "25",
+																			"type": "text",
+																			"label": "(Z)"
+																		},
+																		{
+																			"name": "26",
+																			"type": "text",
+																			"label": "(AA)"
+																		},
+																		{
+																			"name": "27",
+																			"type": "text",
+																			"label": "(AB)"
+																		},
+																		{
+																			"name": "28",
+																			"type": "text",
+																			"label": "(AC)"
+																		}
+																	],
+																	"type": "collection",
+																	"label": "Values"
+																}
+															]
+														},
+														"insertDataOption": {
+															"mode": "chose",
+															"label": "Insert rows"
+														},
+														"valueInputOption": {
+															"mode": "chose",
+															"label": "User entered"
+														},
+														"insertUnformatted": {
+															"mode": "chose"
+														}
+													},
+													"parameters": {
+														"__IMTCONN__": {
+															"data": {
+																"scoped": "true",
+																"connection": "google"
+															},
+															"label": "My Google connection (alexbarkova9@gmail.com)"
+														}
+													}
+												},
+												"parameters": [
+													{
+														"name": "__IMTCONN__",
+														"type": "account:google",
+														"label": "Connection",
+														"required": true
+													}
+												],
+												"expect": [
+													{
+														"name": "mode",
+														"type": "select",
+														"label": "Search Method",
+														"required": true,
+														"validate": {
+															"enum": ["select", "fromAll", "map"]
+														}
+													},
+													{
+														"name": "insertUnformatted",
+														"type": "boolean",
+														"label": "Unformatted",
+														"required": true
+													},
+													{
+														"name": "valueInputOption",
+														"type": "select",
+														"label": "Value input option",
+														"validate": {
+															"enum": ["USER_ENTERED", "RAW"]
+														}
+													},
+													{
+														"name": "insertDataOption",
+														"type": "select",
+														"label": "Insert data option",
+														"validate": {
+															"enum": ["INSERT_ROWS", "OVERWRITE"]
+														}
+													},
+													{
+														"name": "from",
+														"type": "select",
+														"label": "Drive",
+														"required": true,
+														"validate": {
+															"enum": ["drive", "share", "team"]
+														}
+													},
+													{
+														"name": "spreadsheetId",
+														"type": "file",
+														"label": "Spreadsheet ID",
+														"required": true
+													},
+													{
+														"name": "sheetId",
+														"type": "select",
+														"label": "Sheet Name",
+														"required": true
+													},
+													{
+														"name": "includesHeaders",
+														"type": "select",
+														"label": "Table contains headers",
+														"required": true,
+														"validate": {
+															"enum": [true, false]
+														}
+													},
+													{
+														"name": "values",
+														"spec": [
+															{
+																"name": "0",
+																"type": "text",
+																"label": "timestamp (A)"
+															},
+															{
+																"name": "1",
+																"type": "text",
+																"label": "uploader (B)"
+															},
+															{
+																"name": "2",
+																"type": "text",
+																"label": "file_name (C)"
+															},
+															{
+																"name": "3",
+																"type": "text",
+																"label": "file_size_bytes (D)"
+															},
+															{
+																"name": "4",
+																"type": "text",
+																"label": "language (E)"
+															},
+															{
+																"name": "5",
+																"type": "text",
+																"label": "summary (F)"
+															},
+															{
+																"name": "6",
+																"type": "text",
+																"label": "keywords (G)"
+															},
+															{
+																"name": "7",
+																"type": "text",
+																"label": "(H)"
+															},
+															{
+																"name": "8",
+																"type": "text",
+																"label": "(I)"
+															},
+															{
+																"name": "9",
+																"type": "text",
+																"label": "(J)"
+															},
+															{
+																"name": "10",
+																"type": "text",
+																"label": "(K)"
+															},
+															{
+																"name": "11",
+																"type": "text",
+																"label": "(L)"
+															},
+															{
+																"name": "12",
+																"type": "text",
+																"label": "(M)"
+															},
+															{
+																"name": "13",
+																"type": "text",
+																"label": "(N)"
+															},
+															{
+																"name": "14",
+																"type": "text",
+																"label": "(O)"
+															},
+															{
+																"name": "15",
+																"type": "text",
+																"label": "(P)"
+															},
+															{
+																"name": "16",
+																"type": "text",
+																"label": "(Q)"
+															},
+															{
+																"name": "17",
+																"type": "text",
+																"label": "(R)"
+															},
+															{
+																"name": "18",
+																"type": "text",
+																"label": "(S)"
+															},
+															{
+																"name": "19",
+																"type": "text",
+																"label": "(T)"
+															},
+															{
+																"name": "20",
+																"type": "text",
+																"label": "(U)"
+															},
+															{
+																"name": "21",
+																"type": "text",
+																"label": "(V)"
+															},
+															{
+																"name": "22",
+																"type": "text",
+																"label": "(W)"
+															},
+															{
+																"name": "23",
+																"type": "text",
+																"label": "(X)"
+															},
+															{
+																"name": "24",
+																"type": "text",
+																"label": "(Y)"
+															},
+															{
+																"name": "25",
+																"type": "text",
+																"label": "(Z)"
+															},
+															{
+																"name": "26",
+																"type": "text",
+																"label": "(AA)"
+															},
+															{
+																"name": "27",
+																"type": "text",
+																"label": "(AB)"
+															},
+															{
+																"name": "28",
+																"type": "text",
+																"label": "(AC)"
+															}
+														],
+														"type": "collection",
+														"label": "Values"
+													}
+												]
+											}
+										}
+									]
+								},
+								{
+									"flow": [
+										{
+											"id": 12,
+											"module": "http:MakeRequest",
+											"version": 4,
+											"parameters": {
+												"tlsType": "",
+												"proxyKeychain": "",
+												"authenticationType": "noAuth"
+											},
+											"filter": {
+												"name": "",
+												"conditions": [
+													[
+														{
+															"a": "{{10.data.language}}",
+															"b": "en",
+															"o": "text:equal"
+														}
+													]
+												]
+											},
+											"mapper": {
+												"url": "https://router.huggingface.co/hf-inference/models/facebook/bart-large-cnn",
+												"method": "post",
+												"headers": [
+													{
+														"name": "Authorization",
+														"value": "Bearer {YOUR_TOKEN}"
+													},
+													{
+														"name": "Content-Type",
+														"value": "application/json"
+													}
+												],
+												"contentType": "json",
+												"inputMethod": "dataStructure",
+												"shareCookies": false,
+												"parseResponse": true,
+												"allowRedirects": true,
+												"stopOnHttpError": true,
+												"bodyDataStructure": 260955,
+												"dataStructureBodyContent": {
+													"inputs": "{{19.value}}",
+													"options": {
+														"wait_for_model": true
+													},
+													"parameters": {
+														"do_sample": false,
+														"max_length": "300",
+														"min_length": "120"
+													}
+												},
+												"requestCompressedContent": true
+											},
+											"metadata": {
+												"designer": {
+													"x": 3384,
+													"y": -59
+												},
+												"restore": {
+													"expect": {
+														"method": {
+															"mode": "chose",
+															"label": "POST"
+														},
+														"headers": {
+															"mode": "chose",
+															"items": [null, null]
+														},
+														"contentType": {
+															"label": "application/jsonEnter data in the JSON format, as a string or using a data structure."
+														},
+														"inputMethod": {
+															"label": "Data structureDefine the JSON body with a data structure to map or enter values for each key. JSON reserved characters are escaped automatically."
+														},
+														"shareCookies": {
+															"mode": "chose"
+														},
+														"parseResponse": {
+															"mode": "chose"
+														},
+														"allowRedirects": {
+															"mode": "chose"
+														},
+														"paginationType": {
+															"label": "Empty"
+														},
+														"queryParameters": {
+															"mode": "chose"
+														},
+														"stopOnHttpError": {
+															"mode": "chose"
+														},
+														"bodyDataStructure": {
+															"label": "en_summary"
+														},
+														"dataStructureBodyContent": {
+															"nested": {
+																"options": {
+																	"nested": {
+																		"wait_for_model": {
+																			"mode": "chose"
+																		}
+																	}
+																},
+																"parameters": {
+																	"nested": {
+																		"do_sample": {
+																			"mode": "chose"
+																		}
+																	}
+																}
+															}
+														},
+														"requestCompressedContent": {
+															"mode": "chose"
+														}
+													},
+													"parameters": {
+														"tlsType": {
+															"label": "Empty"
+														},
+														"proxyKeychain": {
+															"label": "Choose a key"
+														},
+														"authenticationType": {
+															"label": "No authenticationUse when no credentials are required for the request."
+														}
+													}
+												},
+												"parameters": [
+													{
+														"name": "authenticationType",
+														"type": "select",
+														"label": "Authentication type",
+														"required": true,
+														"validate": {
+															"enum": ["noAuth", "apiKey", "basicAuth", "oAuth"]
+														}
+													},
+													{
+														"name": "tlsType",
+														"type": "select",
+														"label": "Transport layer security (TLS)",
+														"validate": {
+															"enum": ["mTls", "tls"]
+														}
+													},
+													{
+														"name": "proxyKeychain",
+														"type": "keychain:proxy",
+														"label": "Proxy"
+													}
+												],
+												"expect": [
+													{
+														"name": "url",
+														"type": "url",
+														"label": "URL",
+														"required": true
+													},
+													{
+														"name": "method",
+														"type": "select",
+														"label": "Method",
+														"required": true,
+														"validate": {
+															"enum": [
+																"get",
+																"head",
+																"post",
+																"put",
+																"patch",
+																"delete",
+																"options"
+															]
+														}
+													},
+													{
+														"name": "headers",
+														"spec": {
+															"name": "value",
+															"spec": [
+																{
+																	"name": "name",
+																	"type": "text",
+																	"label": "Name",
+																	"required": true,
+																	"validate": {
+																		"pattern": "^[-!#$%&'*+.^_`|~0-9A-Za-z]+$"
+																	}
+																},
+																{
+																	"name": "value",
+																	"type": "text",
+																	"label": "Value"
+																}
+															],
+															"type": "collection",
+															"label": "Header"
+														},
+														"type": "array",
+														"label": "Headers"
+													},
+													{
+														"name": "queryParameters",
+														"spec": {
+															"name": "value",
+															"spec": [
+																{
+																	"name": "name",
+																	"type": "text",
+																	"label": "Name",
+																	"required": true
+																},
+																{
+																	"name": "value",
+																	"type": "text",
+																	"label": "Value"
+																}
+															],
+															"type": "collection",
+															"label": "Parameter"
+														},
+														"type": "array",
+														"label": "Query parameters"
+													},
+													{
+														"name": "contentType",
+														"type": "select",
+														"label": "Body content type",
+														"validate": {
+															"enum": [
+																"json",
+																"multipart",
+																"urlEncoded",
+																"custom"
+															]
+														}
+													},
+													{
+														"name": "parseResponse",
+														"type": "boolean",
+														"label": "Parse response",
+														"required": true
+													},
+													{
+														"name": "stopOnHttpError",
+														"type": "boolean",
+														"label": "Return error if HTTP request fails",
+														"required": true
+													},
+													{
+														"name": "timeout",
+														"type": "uinteger",
+														"label": "Timeout",
+														"validate": {
+															"max": 300,
+															"min": 1
+														}
+													},
+													{
+														"name": "allowRedirects",
+														"type": "boolean",
+														"label": "Allow redirects",
+														"required": true
+													},
+													{
+														"name": "shareCookies",
+														"type": "boolean",
+														"label": "Share cookies with other HTTP modules",
+														"required": true
+													},
+													{
+														"name": "requestCompressedContent",
+														"type": "boolean",
+														"label": "Request compressed content",
+														"required": true
+													},
+													{
+														"name": "inputMethod",
+														"type": "select",
+														"label": "Body input method",
+														"required": true,
+														"validate": {
+															"enum": ["dataStructure", "jsonString"]
+														}
+													},
+													{
+														"name": "bodyDataStructure",
+														"type": "udt",
+														"label": "Body structure",
+														"required": true
+													},
+													{
+														"name": "dataStructureBodyContent",
+														"spec": [
+															{
+																"name": "inputs",
+																"type": "text",
+																"label": "Inputs",
+																"required": true
+															},
+															{
+																"name": "parameters",
+																"spec": [
+																	{
+																		"name": "min_length",
+																		"type": "number",
+																		"label": "Min length"
+																	},
+																	{
+																		"name": "max_length",
+																		"type": "number",
+																		"label": "Max length"
+																	},
+																	{
+																		"name": "do_sample",
+																		"type": "boolean",
+																		"label": "Do sample"
+																	}
+																],
+																"type": "collection",
+																"label": "Parameters"
+															},
+															{
+																"name": "options",
+																"spec": [
+																	{
+																		"name": "wait_for_model",
+																		"type": "boolean",
+																		"label": "Wait for model"
+																	}
+																],
+																"type": "collection",
+																"label": "Options"
+															}
+														],
+														"type": "collection",
+														"label": "Body content"
+													},
+													{
+														"name": "paginationType",
+														"type": "select",
+														"label": "Pagination type",
+														"validate": {
+															"enum": [
+																"offsetBased",
+																"pageBased",
+																"urlBased",
+																"tokenBased"
+															]
+														}
+													}
+												],
+												"interface": [
+													{
+														"name": "data",
+														"type": "any",
+														"label": "Data"
+													},
+													{
+														"name": "statusCode",
+														"type": "number",
+														"label": "Status Code"
+													},
+													{
+														"name": "headers",
+														"spec": [
+															{
+																"name": "content-length",
+																"type": "text",
+																"label": "Content-Length"
+															},
+															{
+																"name": "content-encoding",
+																"type": "text",
+																"label": "Content-Encoding"
+															},
+															{
+																"name": "content-type",
+																"type": "text",
+																"label": "Content-Type"
+															},
+															{
+																"name": "server",
+																"type": "text",
+																"label": "Server"
+															},
+															{
+																"name": "cache-control",
+																"type": "text",
+																"label": "Cache-Control"
+															},
+															{
+																"name": "set-cookie",
+																"spec": {
+																	"type": "text"
+																},
+																"type": "array",
+																"label": "Set-Cookie"
+															}
+														],
+														"type": "collection",
+														"label": "Headers"
+													}
+												]
+											}
+										},
+										{
+											"id": 13,
+											"module": "json:ParseJSON",
+											"version": 1,
+											"parameters": {
+												"type": ""
+											},
+											"mapper": {
+												"json": "{{12.data}}"
+											},
+											"metadata": {
+												"designer": {
+													"x": 3812,
+													"y": -61
+												},
+												"restore": {
+													"parameters": {
+														"type": {
+															"label": "Choose a data structure"
+														}
+													}
+												},
+												"parameters": [
+													{
+														"name": "type",
+														"type": "udt",
+														"label": "Data structure"
+													}
+												],
+												"expect": [
+													{
+														"name": "json",
+														"type": "text",
+														"label": "JSON string",
+														"required": true
+													}
+												]
+											}
+										},
+										{
+											"id": 15,
+											"module": "google-sheets:addRow",
+											"version": 2,
+											"parameters": {
+												"__IMTCONN__": 4020739
+											},
+											"mapper": {
+												"from": "drive",
+												"mode": "select",
+												"values": {
+													"0": "{{1.message.date}}",
+													"1": "{{1.message.from.username}}",
+													"2": "{{1.message.document.file_name}}",
+													"3": "{{1.message.document.file_size}}",
+													"4": "{{10.data.language}}",
+													"5": "{{13.summary_text}}",
+													"6": "{{10.data.keywords_str}}"
+												},
+												"sheetId": "Лист1",
+												"spreadsheetId": "/1XAr_r6eQEZpsb4AiEqNjBe-eVlhut4YcHcXkQD-LBmM",
+												"includesHeaders": true,
+												"insertDataOption": "INSERT_ROWS",
+												"valueInputOption": "USER_ENTERED",
+												"insertUnformatted": false
+											},
+											"metadata": {
+												"designer": {
+													"x": 4233,
+													"y": -66
+												},
+												"restore": {
+													"expect": {
+														"from": {
+															"label": "My Drive"
+														},
+														"mode": {
+															"label": "Search by path"
+														},
+														"sheetId": {
+															"label": "Лист1"
+														},
+														"spreadsheetId": {
+															"path": ["vk_database"]
+														},
+														"includesHeaders": {
+															"label": "Yes",
+															"nested": [
+																{
+																	"name": "values",
+																	"spec": [
+																		{
+																			"name": "0",
+																			"type": "text",
+																			"label": "timestamp (A)"
+																		},
+																		{
+																			"name": "1",
+																			"type": "text",
+																			"label": "uploader (B)"
+																		},
+																		{
+																			"name": "2",
+																			"type": "text",
+																			"label": "file_name (C)"
+																		},
+																		{
+																			"name": "3",
+																			"type": "text",
+																			"label": "file_size_bytes (D)"
+																		},
+																		{
+																			"name": "4",
+																			"type": "text",
+																			"label": "language (E)"
+																		},
+																		{
+																			"name": "5",
+																			"type": "text",
+																			"label": "summary (F)"
+																		},
+																		{
+																			"name": "6",
+																			"type": "text",
+																			"label": "keywords (G)"
+																		},
+																		{
+																			"name": "7",
+																			"type": "text",
+																			"label": "(H)"
+																		},
+																		{
+																			"name": "8",
+																			"type": "text",
+																			"label": "(I)"
+																		},
+																		{
+																			"name": "9",
+																			"type": "text",
+																			"label": "(J)"
+																		},
+																		{
+																			"name": "10",
+																			"type": "text",
+																			"label": "(K)"
+																		},
+																		{
+																			"name": "11",
+																			"type": "text",
+																			"label": "(L)"
+																		},
+																		{
+																			"name": "12",
+																			"type": "text",
+																			"label": "(M)"
+																		},
+																		{
+																			"name": "13",
+																			"type": "text",
+																			"label": "(N)"
+																		},
+																		{
+																			"name": "14",
+																			"type": "text",
+																			"label": "(O)"
+																		},
+																		{
+																			"name": "15",
+																			"type": "text",
+																			"label": "(P)"
+																		},
+																		{
+																			"name": "16",
+																			"type": "text",
+																			"label": "(Q)"
+																		},
+																		{
+																			"name": "17",
+																			"type": "text",
+																			"label": "(R)"
+																		},
+																		{
+																			"name": "18",
+																			"type": "text",
+																			"label": "(S)"
+																		},
+																		{
+																			"name": "19",
+																			"type": "text",
+																			"label": "(T)"
+																		},
+																		{
+																			"name": "20",
+																			"type": "text",
+																			"label": "(U)"
+																		},
+																		{
+																			"name": "21",
+																			"type": "text",
+																			"label": "(V)"
+																		},
+																		{
+																			"name": "22",
+																			"type": "text",
+																			"label": "(W)"
+																		},
+																		{
+																			"name": "23",
+																			"type": "text",
+																			"label": "(X)"
+																		},
+																		{
+																			"name": "24",
+																			"type": "text",
+																			"label": "(Y)"
+																		},
+																		{
+																			"name": "25",
+																			"type": "text",
+																			"label": "(Z)"
+																		},
+																		{
+																			"name": "26",
+																			"type": "text",
+																			"label": "(AA)"
+																		},
+																		{
+																			"name": "27",
+																			"type": "text",
+																			"label": "(AB)"
+																		},
+																		{
+																			"name": "28",
+																			"type": "text",
+																			"label": "(AC)"
+																		}
+																	],
+																	"type": "collection",
+																	"label": "Values"
+																}
+															]
+														},
+														"insertDataOption": {
+															"mode": "chose",
+															"label": "Insert rows"
+														},
+														"valueInputOption": {
+															"mode": "chose",
+															"label": "User entered"
+														},
+														"insertUnformatted": {
+															"mode": "chose"
+														}
+													},
+													"parameters": {
+														"__IMTCONN__": {
+															"data": {
+																"scoped": "true",
+																"connection": "google"
+															},
+															"label": "My Google connection (alexbarkova9@gmail.com)"
+														}
+													}
+												},
+												"parameters": [
+													{
+														"name": "__IMTCONN__",
+														"type": "account:google",
+														"label": "Connection",
+														"required": true
+													}
+												],
+												"expect": [
+													{
+														"name": "mode",
+														"type": "select",
+														"label": "Search Method",
+														"required": true,
+														"validate": {
+															"enum": ["select", "fromAll", "map"]
+														}
+													},
+													{
+														"name": "insertUnformatted",
+														"type": "boolean",
+														"label": "Unformatted",
+														"required": true
+													},
+													{
+														"name": "valueInputOption",
+														"type": "select",
+														"label": "Value input option",
+														"validate": {
+															"enum": ["USER_ENTERED", "RAW"]
+														}
+													},
+													{
+														"name": "insertDataOption",
+														"type": "select",
+														"label": "Insert data option",
+														"validate": {
+															"enum": ["INSERT_ROWS", "OVERWRITE"]
+														}
+													},
+													{
+														"name": "from",
+														"type": "select",
+														"label": "Drive",
+														"required": true,
+														"validate": {
+															"enum": ["drive", "share", "team"]
+														}
+													},
+													{
+														"name": "spreadsheetId",
+														"type": "file",
+														"label": "Spreadsheet ID",
+														"required": true
+													},
+													{
+														"name": "sheetId",
+														"type": "select",
+														"label": "Sheet Name",
+														"required": true
+													},
+													{
+														"name": "includesHeaders",
+														"type": "select",
+														"label": "Table contains headers",
+														"required": true,
+														"validate": {
+															"enum": [true, false]
+														}
+													},
+													{
+														"name": "values",
+														"spec": [
+															{
+																"name": "0",
+																"type": "text",
+																"label": "timestamp (A)"
+															},
+															{
+																"name": "1",
+																"type": "text",
+																"label": "uploader (B)"
+															},
+															{
+																"name": "2",
+																"type": "text",
+																"label": "file_name (C)"
+															},
+															{
+																"name": "3",
+																"type": "text",
+																"label": "file_size_bytes (D)"
+															},
+															{
+																"name": "4",
+																"type": "text",
+																"label": "language (E)"
+															},
+															{
+																"name": "5",
+																"type": "text",
+																"label": "summary (F)"
+															},
+															{
+																"name": "6",
+																"type": "text",
+																"label": "keywords (G)"
+															},
+															{
+																"name": "7",
+																"type": "text",
+																"label": "(H)"
+															},
+															{
+																"name": "8",
+																"type": "text",
+																"label": "(I)"
+															},
+															{
+																"name": "9",
+																"type": "text",
+																"label": "(J)"
+															},
+															{
+																"name": "10",
+																"type": "text",
+																"label": "(K)"
+															},
+															{
+																"name": "11",
+																"type": "text",
+																"label": "(L)"
+															},
+															{
+																"name": "12",
+																"type": "text",
+																"label": "(M)"
+															},
+															{
+																"name": "13",
+																"type": "text",
+																"label": "(N)"
+															},
+															{
+																"name": "14",
+																"type": "text",
+																"label": "(O)"
+															},
+															{
+																"name": "15",
+																"type": "text",
+																"label": "(P)"
+															},
+															{
+																"name": "16",
+																"type": "text",
+																"label": "(Q)"
+															},
+															{
+																"name": "17",
+																"type": "text",
+																"label": "(R)"
+															},
+															{
+																"name": "18",
+																"type": "text",
+																"label": "(S)"
+															},
+															{
+																"name": "19",
+																"type": "text",
+																"label": "(T)"
+															},
+															{
+																"name": "20",
+																"type": "text",
+																"label": "(U)"
+															},
+															{
+																"name": "21",
+																"type": "text",
+																"label": "(V)"
+															},
+															{
+																"name": "22",
+																"type": "text",
+																"label": "(W)"
+															},
+															{
+																"name": "23",
+																"type": "text",
+																"label": "(X)"
+															},
+															{
+																"name": "24",
+																"type": "text",
+																"label": "(Y)"
+															},
+															{
+																"name": "25",
+																"type": "text",
+																"label": "(Z)"
+															},
+															{
+																"name": "26",
+																"type": "text",
+																"label": "(AA)"
+															},
+															{
+																"name": "27",
+																"type": "text",
+																"label": "(AB)"
+															},
+															{
+																"name": "28",
+																"type": "text",
+																"label": "(AC)"
+															}
+														],
+														"type": "collection",
+														"label": "Values"
+													}
+												]
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				{
+					"flow": [
+						{
+							"id": 23,
+							"module": "http:MakeRequest",
+							"version": 4,
+							"parameters": {
+								"tlsType": "",
+								"proxyKeychain": "",
+								"authenticationType": "noAuth"
+							},
+							"filter": {
+								"name": "",
+								"conditions": [
+									[
+										{
+											"a": "{{1.message.document.file_name}}",
+											"b": "txt",
+											"o": "text:endwith"
+										}
+									]
+								]
+							},
+							"mapper": {
+								"url": "https://ariah-homeliest-nongeographically.ngrok-free.dev/keywords",
+								"method": "post",
+								"headers": [
+									{
+										"name": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"contentType": "json",
+								"inputMethod": "dataStructure",
+								"shareCookies": false,
+								"parseResponse": true,
+								"allowRedirects": true,
+								"stopOnHttpError": true,
+								"bodyDataStructure": 260947,
+								"dataStructureBodyContent": {
+									"text": "{{16.fileOutput}}",
+									"max_keywords": "8"
+								},
+								"requestCompressedContent": true
+							},
+							"metadata": {
+								"designer": {
+									"x": 2762,
+									"y": 501
+								},
+								"restore": {
+									"expect": {
+										"method": {
+											"mode": "chose",
+											"label": "POST"
+										},
+										"headers": {
+											"mode": "chose",
+											"items": [null]
+										},
+										"contentType": {
+											"label": "application/jsonEnter data in the JSON format, as a string or using a data structure."
+										},
+										"inputMethod": {
+											"label": "Data structureDefine the JSON body with a data structure to map or enter values for each key. JSON reserved characters are escaped automatically."
+										},
+										"shareCookies": {
+											"mode": "chose"
+										},
+										"parseResponse": {
+											"mode": "chose"
+										},
+										"allowRedirects": {
+											"mode": "chose"
+										},
+										"paginationType": {
+											"label": "Empty"
+										},
+										"queryParameters": {
+											"mode": "chose"
+										},
+										"stopOnHttpError": {
+											"mode": "chose"
+										},
+										"bodyDataStructure": {
+											"label": "My data structure"
+										},
+										"requestCompressedContent": {
+											"mode": "chose"
+										}
+									},
+									"parameters": {
+										"tlsType": {
+											"label": "Empty"
+										},
+										"proxyKeychain": {
+											"label": "Choose a key"
+										},
+										"authenticationType": {
+											"label": "No authenticationUse when no credentials are required for the request."
+										}
+									}
+								},
+								"parameters": [
+									{
+										"name": "authenticationType",
+										"type": "select",
+										"label": "Authentication type",
+										"required": true,
+										"validate": {
+											"enum": ["noAuth", "apiKey", "basicAuth", "oAuth"]
+										}
+									},
+									{
+										"name": "tlsType",
+										"type": "select",
+										"label": "Transport layer security (TLS)",
+										"validate": {
+											"enum": ["mTls", "tls"]
+										}
+									},
+									{
+										"name": "proxyKeychain",
+										"type": "keychain:proxy",
+										"label": "Proxy"
+									}
+								],
+								"expect": [
+									{
+										"name": "url",
+										"type": "url",
+										"label": "URL",
+										"required": true
+									},
+									{
+										"name": "method",
+										"type": "select",
+										"label": "Method",
+										"required": true,
+										"validate": {
+											"enum": [
+												"get",
+												"head",
+												"post",
+												"put",
+												"patch",
+												"delete",
+												"options"
+											]
+										}
+									},
+									{
+										"name": "headers",
+										"spec": {
+											"name": "value",
+											"spec": [
+												{
+													"name": "name",
+													"type": "text",
+													"label": "Name",
+													"required": true,
+													"validate": {
+														"pattern": "^[-!#$%&'*+.^_`|~0-9A-Za-z]+$"
+													}
+												},
+												{
+													"name": "value",
+													"type": "text",
+													"label": "Value"
+												}
+											],
+											"type": "collection",
+											"label": "Header"
+										},
+										"type": "array",
+										"label": "Headers"
+									},
+									{
+										"name": "queryParameters",
+										"spec": {
+											"name": "value",
+											"spec": [
+												{
+													"name": "name",
+													"type": "text",
+													"label": "Name",
+													"required": true
+												},
+												{
+													"name": "value",
+													"type": "text",
+													"label": "Value"
+												}
+											],
+											"type": "collection",
+											"label": "Parameter"
+										},
+										"type": "array",
+										"label": "Query parameters"
+									},
+									{
+										"name": "contentType",
+										"type": "select",
+										"label": "Body content type",
+										"validate": {
+											"enum": ["json", "multipart", "urlEncoded", "custom"]
+										}
+									},
+									{
+										"name": "parseResponse",
+										"type": "boolean",
+										"label": "Parse response",
+										"required": true
+									},
+									{
+										"name": "stopOnHttpError",
+										"type": "boolean",
+										"label": "Return error if HTTP request fails",
+										"required": true
+									},
+									{
+										"name": "timeout",
+										"type": "uinteger",
+										"label": "Timeout",
+										"validate": {
+											"max": 300,
+											"min": 1
+										}
+									},
+									{
+										"name": "allowRedirects",
+										"type": "boolean",
+										"label": "Allow redirects",
+										"required": true
+									},
+									{
+										"name": "shareCookies",
+										"type": "boolean",
+										"label": "Share cookies with other HTTP modules",
+										"required": true
+									},
+									{
+										"name": "requestCompressedContent",
+										"type": "boolean",
+										"label": "Request compressed content",
+										"required": true
+									},
+									{
+										"name": "inputMethod",
+										"type": "select",
+										"label": "Body input method",
+										"required": true,
+										"validate": {
+											"enum": ["dataStructure", "jsonString"]
+										}
+									},
+									{
+										"name": "bodyDataStructure",
+										"type": "udt",
+										"label": "Body structure",
+										"required": true
+									},
+									{
+										"name": "dataStructureBodyContent",
+										"spec": [
+											{
+												"name": "text",
+												"type": "text",
+												"label": "Text"
+											},
+											{
+												"name": "max_keywords",
+												"type": "number",
+												"label": "Max keywords"
+											}
+										],
+										"type": "collection",
+										"label": "Body content"
+									},
+									{
+										"name": "paginationType",
+										"type": "select",
+										"label": "Pagination type",
+										"validate": {
+											"enum": [
+												"offsetBased",
+												"pageBased",
+												"urlBased",
+												"tokenBased"
+											]
+										}
+									}
+								],
+								"interface": [
+									{
+										"name": "data",
+										"type": "any",
+										"label": "Data"
+									},
+									{
+										"name": "statusCode",
+										"type": "number",
+										"label": "Status Code"
+									},
+									{
+										"name": "headers",
+										"spec": [
+											{
+												"name": "content-length",
+												"type": "text",
+												"label": "Content-Length"
+											},
+											{
+												"name": "content-encoding",
+												"type": "text",
+												"label": "Content-Encoding"
+											},
+											{
+												"name": "content-type",
+												"type": "text",
+												"label": "Content-Type"
+											},
+											{
+												"name": "server",
+												"type": "text",
+												"label": "Server"
+											},
+											{
+												"name": "cache-control",
+												"type": "text",
+												"label": "Cache-Control"
+											},
+											{
+												"name": "set-cookie",
+												"spec": {
+													"type": "text"
+												},
+												"type": "array",
+												"label": "Set-Cookie"
+											}
+										],
+										"type": "collection",
+										"label": "Headers"
+									}
+								]
+							}
+						},
+						{
+							"id": 24,
+							"module": "builtin:BasicRouter",
+							"version": 1,
+							"mapper": null,
+							"metadata": {
+								"designer": {
+									"x": 3062,
+									"y": 501
+								}
+							},
+							"routes": [
+								{
+									"flow": [
+										{
+											"id": 25,
+											"module": "http:MakeRequest",
+											"version": 4,
+											"parameters": {
+												"tlsType": "",
+												"proxyKeychain": "",
+												"authenticationType": "noAuth"
+											},
+											"filter": {
+												"name": "",
+												"conditions": [
+													[
+														{
+															"a": "{{23.data.language}}",
+															"b": "ru",
+															"o": "text:equal"
+														}
+													]
+												]
+											},
+											"mapper": {
+												"url": "https://router.huggingface.co/hf-inference/models/cointegrated/rut5-base-absum",
+												"method": "post",
+												"headers": [
+													{
+														"name": "Authorization",
+														"value": "Bearer {YOUR_TOKEN}"
+													},
+													{
+														"name": "Content-Type",
+														"value": "application/json"
+													}
+												],
+												"contentType": "json",
+												"inputMethod": "dataStructure",
+												"shareCookies": false,
+												"parseResponse": true,
+												"allowRedirects": true,
+												"stopOnHttpError": true,
+												"bodyDataStructure": 260948,
+												"dataStructureBodyContent": {
+													"inputs": "{{16.fileOutput}}",
+													"options": {
+														"wait_for_model": true
+													},
+													"parameters": {
+														"do_sample": false,
+														"num_beams": "4",
+														"max_length": "300",
+														"min_length": "140",
+														"repetition_penalty": "10.2"
+													}
+												},
+												"requestCompressedContent": true
+											},
+											"metadata": {
+												"designer": {
+													"x": 3400,
+													"y": 322
+												},
+												"restore": {
+													"expect": {
+														"method": {
+															"mode": "chose",
+															"label": "POST"
+														},
+														"headers": {
+															"mode": "chose",
+															"items": [null, null]
+														},
+														"contentType": {
+															"label": "application/jsonEnter data in the JSON format, as a string or using a data structure."
+														},
+														"inputMethod": {
+															"label": "Data structureDefine the JSON body with a data structure to map or enter values for each key. JSON reserved characters are escaped automatically."
+														},
+														"shareCookies": {
+															"mode": "chose"
+														},
+														"parseResponse": {
+															"mode": "chose"
+														},
+														"allowRedirects": {
+															"mode": "chose"
+														},
+														"paginationType": {
+															"label": "Empty"
+														},
+														"queryParameters": {
+															"mode": "chose"
+														},
+														"stopOnHttpError": {
+															"mode": "chose"
+														},
+														"bodyDataStructure": {
+															"label": "ru_summary"
+														},
+														"dataStructureBodyContent": {
+															"nested": {
+																"options": {
+																	"nested": {
+																		"wait_for_model": {
+																			"mode": "chose"
+																		}
+																	}
+																},
+																"parameters": {
+																	"nested": {
+																		"do_sample": {
+																			"mode": "chose"
+																		}
+																	}
+																}
+															}
+														},
+														"requestCompressedContent": {
+															"mode": "chose"
+														}
+													},
+													"parameters": {
+														"tlsType": {
+															"label": "Empty"
+														},
+														"proxyKeychain": {
+															"label": "Choose a key"
+														},
+														"authenticationType": {
+															"label": "No authenticationUse when no credentials are required for the request."
+														}
+													}
+												},
+												"parameters": [
+													{
+														"name": "authenticationType",
+														"type": "select",
+														"label": "Authentication type",
+														"required": true,
+														"validate": {
+															"enum": ["noAuth", "apiKey", "basicAuth", "oAuth"]
+														}
+													},
+													{
+														"name": "tlsType",
+														"type": "select",
+														"label": "Transport layer security (TLS)",
+														"validate": {
+															"enum": ["mTls", "tls"]
+														}
+													},
+													{
+														"name": "proxyKeychain",
+														"type": "keychain:proxy",
+														"label": "Proxy"
+													}
+												],
+												"expect": [
+													{
+														"name": "url",
+														"type": "url",
+														"label": "URL",
+														"required": true
+													},
+													{
+														"name": "method",
+														"type": "select",
+														"label": "Method",
+														"required": true,
+														"validate": {
+															"enum": [
+																"get",
+																"head",
+																"post",
+																"put",
+																"patch",
+																"delete",
+																"options"
+															]
+														}
+													},
+													{
+														"name": "headers",
+														"spec": {
+															"name": "value",
+															"spec": [
+																{
+																	"name": "name",
+																	"type": "text",
+																	"label": "Name",
+																	"required": true,
+																	"validate": {
+																		"pattern": "^[-!#$%&'*+.^_`|~0-9A-Za-z]+$"
+																	}
+																},
+																{
+																	"name": "value",
+																	"type": "text",
+																	"label": "Value"
+																}
+															],
+															"type": "collection",
+															"label": "Header"
+														},
+														"type": "array",
+														"label": "Headers"
+													},
+													{
+														"name": "queryParameters",
+														"spec": {
+															"name": "value",
+															"spec": [
+																{
+																	"name": "name",
+																	"type": "text",
+																	"label": "Name",
+																	"required": true
+																},
+																{
+																	"name": "value",
+																	"type": "text",
+																	"label": "Value"
+																}
+															],
+															"type": "collection",
+															"label": "Parameter"
+														},
+														"type": "array",
+														"label": "Query parameters"
+													},
+													{
+														"name": "contentType",
+														"type": "select",
+														"label": "Body content type",
+														"validate": {
+															"enum": [
+																"json",
+																"multipart",
+																"urlEncoded",
+																"custom"
+															]
+														}
+													},
+													{
+														"name": "parseResponse",
+														"type": "boolean",
+														"label": "Parse response",
+														"required": true
+													},
+													{
+														"name": "stopOnHttpError",
+														"type": "boolean",
+														"label": "Return error if HTTP request fails",
+														"required": true
+													},
+													{
+														"name": "timeout",
+														"type": "uinteger",
+														"label": "Timeout",
+														"validate": {
+															"max": 300,
+															"min": 1
+														}
+													},
+													{
+														"name": "allowRedirects",
+														"type": "boolean",
+														"label": "Allow redirects",
+														"required": true
+													},
+													{
+														"name": "shareCookies",
+														"type": "boolean",
+														"label": "Share cookies with other HTTP modules",
+														"required": true
+													},
+													{
+														"name": "requestCompressedContent",
+														"type": "boolean",
+														"label": "Request compressed content",
+														"required": true
+													},
+													{
+														"name": "inputMethod",
+														"type": "select",
+														"label": "Body input method",
+														"required": true,
+														"validate": {
+															"enum": ["dataStructure", "jsonString"]
+														}
+													},
+													{
+														"name": "bodyDataStructure",
+														"type": "udt",
+														"label": "Body structure",
+														"required": true
+													},
+													{
+														"name": "dataStructureBodyContent",
+														"spec": [
+															{
+																"name": "inputs",
+																"type": "text",
+																"label": "Inputs",
+																"required": true
+															},
+															{
+																"name": "parameters",
+																"spec": [
+																	{
+																		"name": "min_length",
+																		"type": "number",
+																		"label": "Min length"
+																	},
+																	{
+																		"name": "max_length",
+																		"type": "number",
+																		"label": "Max length"
+																	},
+																	{
+																		"name": "num_beams",
+																		"type": "number",
+																		"label": "Num beams"
+																	},
+																	{
+																		"name": "repetition_penalty",
+																		"type": "number",
+																		"label": "Repetition penalty"
+																	},
+																	{
+																		"name": "do_sample",
+																		"type": "boolean",
+																		"label": "Do sample"
+																	}
+																],
+																"type": "collection",
+																"label": "Parameters"
+															},
+															{
+																"name": "options",
+																"spec": [
+																	{
+																		"name": "wait_for_model",
+																		"type": "boolean",
+																		"label": "Wait for model"
+																	}
+																],
+																"type": "collection",
+																"label": "Options"
+															}
+														],
+														"type": "collection",
+														"label": "Body content"
+													},
+													{
+														"name": "paginationType",
+														"type": "select",
+														"label": "Pagination type",
+														"validate": {
+															"enum": [
+																"offsetBased",
+																"pageBased",
+																"urlBased",
+																"tokenBased"
+															]
+														}
+													}
+												],
+												"interface": [
+													{
+														"name": "data",
+														"type": "any",
+														"label": "Data"
+													},
+													{
+														"name": "statusCode",
+														"type": "number",
+														"label": "Status Code"
+													},
+													{
+														"name": "headers",
+														"spec": [
+															{
+																"name": "content-length",
+																"type": "text",
+																"label": "Content-Length"
+															},
+															{
+																"name": "content-encoding",
+																"type": "text",
+																"label": "Content-Encoding"
+															},
+															{
+																"name": "content-type",
+																"type": "text",
+																"label": "Content-Type"
+															},
+															{
+																"name": "server",
+																"type": "text",
+																"label": "Server"
+															},
+															{
+																"name": "cache-control",
+																"type": "text",
+																"label": "Cache-Control"
+															},
+															{
+																"name": "set-cookie",
+																"spec": {
+																	"type": "text"
+																},
+																"type": "array",
+																"label": "Set-Cookie"
+															}
+														],
+														"type": "collection",
+														"label": "Headers"
+													}
+												]
+											}
+										},
+										{
+											"id": 26,
+											"module": "json:ParseJSON",
+											"version": 1,
+											"parameters": {
+												"type": ""
+											},
+											"mapper": {
+												"json": "{{25.data}}"
+											},
+											"metadata": {
+												"designer": {
+													"x": 3824,
+													"y": 318
+												},
+												"restore": {
+													"parameters": {
+														"type": {
+															"label": "Choose a data structure"
+														}
+													}
+												},
+												"parameters": [
+													{
+														"name": "type",
+														"type": "udt",
+														"label": "Data structure"
+													}
+												],
+												"expect": [
+													{
+														"name": "json",
+														"type": "text",
+														"label": "JSON string",
+														"required": true
+													}
+												]
+											}
+										},
+										{
+											"id": 27,
+											"module": "google-sheets:addRow",
+											"version": 2,
+											"parameters": {
+												"__IMTCONN__": 4020739
+											},
+											"mapper": {
+												"from": "drive",
+												"mode": "select",
+												"values": {
+													"0": "{{1.message.date}}",
+													"1": "{{1.message.from.username}}",
+													"2": "{{1.message.document.file_name}}",
+													"3": "{{1.message.document.file_size}}",
+													"4": "{{23.data.language}}",
+													"5": "{{25.data}}",
+													"6": "{{23.data.keywords_str}}"
+												},
+												"sheetId": "Лист1",
+												"spreadsheetId": "/1XAr_r6eQEZpsb4AiEqNjBe-eVlhut4YcHcXkQD-LBmM",
+												"includesHeaders": true,
+												"insertDataOption": "INSERT_ROWS",
+												"valueInputOption": "USER_ENTERED",
+												"insertUnformatted": false
+											},
+											"metadata": {
+												"designer": {
+													"x": 4225,
+													"y": 313
+												},
+												"restore": {
+													"expect": {
+														"from": {
+															"label": "My Drive"
+														},
+														"mode": {
+															"label": "Search by path"
+														},
+														"sheetId": {
+															"label": "Лист1"
+														},
+														"spreadsheetId": {
+															"path": ["vk_database"]
+														},
+														"includesHeaders": {
+															"label": "Yes",
+															"nested": [
+																{
+																	"name": "values",
+																	"spec": [
+																		{
+																			"name": "0",
+																			"type": "text",
+																			"label": "timestamp (A)"
+																		},
+																		{
+																			"name": "1",
+																			"type": "text",
+																			"label": "uploader (B)"
+																		},
+																		{
+																			"name": "2",
+																			"type": "text",
+																			"label": "file_name (C)"
+																		},
+																		{
+																			"name": "3",
+																			"type": "text",
+																			"label": "file_size_bytes (D)"
+																		},
+																		{
+																			"name": "4",
+																			"type": "text",
+																			"label": "language (E)"
+																		},
+																		{
+																			"name": "5",
+																			"type": "text",
+																			"label": "summary (F)"
+																		},
+																		{
+																			"name": "6",
+																			"type": "text",
+																			"label": "keywords (G)"
+																		},
+																		{
+																			"name": "7",
+																			"type": "text",
+																			"label": "(H)"
+																		},
+																		{
+																			"name": "8",
+																			"type": "text",
+																			"label": "(I)"
+																		},
+																		{
+																			"name": "9",
+																			"type": "text",
+																			"label": "(J)"
+																		},
+																		{
+																			"name": "10",
+																			"type": "text",
+																			"label": "(K)"
+																		},
+																		{
+																			"name": "11",
+																			"type": "text",
+																			"label": "(L)"
+																		},
+																		{
+																			"name": "12",
+																			"type": "text",
+																			"label": "(M)"
+																		},
+																		{
+																			"name": "13",
+																			"type": "text",
+																			"label": "(N)"
+																		},
+																		{
+																			"name": "14",
+																			"type": "text",
+																			"label": "(O)"
+																		},
+																		{
+																			"name": "15",
+																			"type": "text",
+																			"label": "(P)"
+																		},
+																		{
+																			"name": "16",
+																			"type": "text",
+																			"label": "(Q)"
+																		},
+																		{
+																			"name": "17",
+																			"type": "text",
+																			"label": "(R)"
+																		},
+																		{
+																			"name": "18",
+																			"type": "text",
+																			"label": "(S)"
+																		},
+																		{
+																			"name": "19",
+																			"type": "text",
+																			"label": "(T)"
+																		},
+																		{
+																			"name": "20",
+																			"type": "text",
+																			"label": "(U)"
+																		},
+																		{
+																			"name": "21",
+																			"type": "text",
+																			"label": "(V)"
+																		},
+																		{
+																			"name": "22",
+																			"type": "text",
+																			"label": "(W)"
+																		},
+																		{
+																			"name": "23",
+																			"type": "text",
+																			"label": "(X)"
+																		},
+																		{
+																			"name": "24",
+																			"type": "text",
+																			"label": "(Y)"
+																		},
+																		{
+																			"name": "25",
+																			"type": "text",
+																			"label": "(Z)"
+																		},
+																		{
+																			"name": "26",
+																			"type": "text",
+																			"label": "(AA)"
+																		},
+																		{
+																			"name": "27",
+																			"type": "text",
+																			"label": "(AB)"
+																		},
+																		{
+																			"name": "28",
+																			"type": "text",
+																			"label": "(AC)"
+																		}
+																	],
+																	"type": "collection",
+																	"label": "Values"
+																}
+															]
+														},
+														"insertDataOption": {
+															"mode": "chose",
+															"label": "Insert rows"
+														},
+														"valueInputOption": {
+															"mode": "chose",
+															"label": "User entered"
+														},
+														"insertUnformatted": {
+															"mode": "chose"
+														}
+													},
+													"parameters": {
+														"__IMTCONN__": {
+															"data": {
+																"scoped": "true",
+																"connection": "google"
+															},
+															"label": "My Google connection (alexbarkova9@gmail.com)"
+														}
+													}
+												},
+												"parameters": [
+													{
+														"name": "__IMTCONN__",
+														"type": "account:google",
+														"label": "Connection",
+														"required": true
+													}
+												],
+												"expect": [
+													{
+														"name": "mode",
+														"type": "select",
+														"label": "Search Method",
+														"required": true,
+														"validate": {
+															"enum": ["select", "fromAll", "map"]
+														}
+													},
+													{
+														"name": "insertUnformatted",
+														"type": "boolean",
+														"label": "Unformatted",
+														"required": true
+													},
+													{
+														"name": "valueInputOption",
+														"type": "select",
+														"label": "Value input option",
+														"validate": {
+															"enum": ["USER_ENTERED", "RAW"]
+														}
+													},
+													{
+														"name": "insertDataOption",
+														"type": "select",
+														"label": "Insert data option",
+														"validate": {
+															"enum": ["INSERT_ROWS", "OVERWRITE"]
+														}
+													},
+													{
+														"name": "from",
+														"type": "select",
+														"label": "Drive",
+														"required": true,
+														"validate": {
+															"enum": ["drive", "share", "team"]
+														}
+													},
+													{
+														"name": "spreadsheetId",
+														"type": "file",
+														"label": "Spreadsheet ID",
+														"required": true
+													},
+													{
+														"name": "sheetId",
+														"type": "select",
+														"label": "Sheet Name",
+														"required": true
+													},
+													{
+														"name": "includesHeaders",
+														"type": "select",
+														"label": "Table contains headers",
+														"required": true,
+														"validate": {
+															"enum": [true, false]
+														}
+													},
+													{
+														"name": "values",
+														"spec": [
+															{
+																"name": "0",
+																"type": "text",
+																"label": "timestamp (A)"
+															},
+															{
+																"name": "1",
+																"type": "text",
+																"label": "uploader (B)"
+															},
+															{
+																"name": "2",
+																"type": "text",
+																"label": "file_name (C)"
+															},
+															{
+																"name": "3",
+																"type": "text",
+																"label": "file_size_bytes (D)"
+															},
+															{
+																"name": "4",
+																"type": "text",
+																"label": "language (E)"
+															},
+															{
+																"name": "5",
+																"type": "text",
+																"label": "summary (F)"
+															},
+															{
+																"name": "6",
+																"type": "text",
+																"label": "keywords (G)"
+															},
+															{
+																"name": "7",
+																"type": "text",
+																"label": "(H)"
+															},
+															{
+																"name": "8",
+																"type": "text",
+																"label": "(I)"
+															},
+															{
+																"name": "9",
+																"type": "text",
+																"label": "(J)"
+															},
+															{
+																"name": "10",
+																"type": "text",
+																"label": "(K)"
+															},
+															{
+																"name": "11",
+																"type": "text",
+																"label": "(L)"
+															},
+															{
+																"name": "12",
+																"type": "text",
+																"label": "(M)"
+															},
+															{
+																"name": "13",
+																"type": "text",
+																"label": "(N)"
+															},
+															{
+																"name": "14",
+																"type": "text",
+																"label": "(O)"
+															},
+															{
+																"name": "15",
+																"type": "text",
+																"label": "(P)"
+															},
+															{
+																"name": "16",
+																"type": "text",
+																"label": "(Q)"
+															},
+															{
+																"name": "17",
+																"type": "text",
+																"label": "(R)"
+															},
+															{
+																"name": "18",
+																"type": "text",
+																"label": "(S)"
+															},
+															{
+																"name": "19",
+																"type": "text",
+																"label": "(T)"
+															},
+															{
+																"name": "20",
+																"type": "text",
+																"label": "(U)"
+															},
+															{
+																"name": "21",
+																"type": "text",
+																"label": "(V)"
+															},
+															{
+																"name": "22",
+																"type": "text",
+																"label": "(W)"
+															},
+															{
+																"name": "23",
+																"type": "text",
+																"label": "(X)"
+															},
+															{
+																"name": "24",
+																"type": "text",
+																"label": "(Y)"
+															},
+															{
+																"name": "25",
+																"type": "text",
+																"label": "(Z)"
+															},
+															{
+																"name": "26",
+																"type": "text",
+																"label": "(AA)"
+															},
+															{
+																"name": "27",
+																"type": "text",
+																"label": "(AB)"
+															},
+															{
+																"name": "28",
+																"type": "text",
+																"label": "(AC)"
+															}
+														],
+														"type": "collection",
+														"label": "Values"
+													}
+												]
+											}
+										}
+									]
+								},
+								{
+									"flow": [
+										{
+											"id": 28,
+											"module": "http:MakeRequest",
+											"version": 4,
+											"parameters": {
+												"tlsType": "",
+												"proxyKeychain": "",
+												"authenticationType": "noAuth"
+											},
+											"filter": {
+												"name": "",
+												"conditions": [
+													[
+														{
+															"a": "{{23.data.language}}",
+															"b": "en",
+															"o": "text:equal"
+														}
+													]
+												]
+											},
+											"mapper": {
+												"url": "https://router.huggingface.co/hf-inference/models/facebook/bart-large-cnn",
+												"method": "post",
+												"headers": [
+													{
+														"name": "Authorization",
+														"value": "Bearer {YOUR_TOKEN}"
+													},
+													{
+														"name": "Content-Type",
+														"value": "application/json"
+													}
+												],
+												"contentType": "json",
+												"inputMethod": "dataStructure",
+												"shareCookies": false,
+												"parseResponse": true,
+												"allowRedirects": true,
+												"stopOnHttpError": true,
+												"bodyDataStructure": 260955,
+												"dataStructureBodyContent": {
+													"inputs": "{{16.fileOutput}}",
+													"options": {
+														"wait_for_model": true
+													},
+													"parameters": {
+														"do_sample": false,
+														"max_length": "300",
+														"min_length": "120"
+													}
+												},
+												"requestCompressedContent": true
+											},
+											"metadata": {
+												"designer": {
+													"x": 3399,
+													"y": 749
+												},
+												"restore": {
+													"expect": {
+														"method": {
+															"mode": "chose",
+															"label": "POST"
+														},
+														"headers": {
+															"mode": "chose",
+															"items": [null, null]
+														},
+														"contentType": {
+															"label": "application/jsonEnter data in the JSON format, as a string or using a data structure."
+														},
+														"inputMethod": {
+															"label": "Data structureDefine the JSON body with a data structure to map or enter values for each key. JSON reserved characters are escaped automatically."
+														},
+														"shareCookies": {
+															"mode": "chose"
+														},
+														"parseResponse": {
+															"mode": "chose"
+														},
+														"allowRedirects": {
+															"mode": "chose"
+														},
+														"paginationType": {
+															"label": "Empty"
+														},
+														"queryParameters": {
+															"mode": "chose"
+														},
+														"stopOnHttpError": {
+															"mode": "chose"
+														},
+														"bodyDataStructure": {
+															"label": "en_summary"
+														},
+														"dataStructureBodyContent": {
+															"nested": {
+																"options": {
+																	"nested": {
+																		"wait_for_model": {
+																			"mode": "chose"
+																		}
+																	}
+																},
+																"parameters": {
+																	"nested": {
+																		"do_sample": {
+																			"mode": "chose"
+																		}
+																	}
+																}
+															}
+														},
+														"requestCompressedContent": {
+															"mode": "chose"
+														}
+													},
+													"parameters": {
+														"tlsType": {
+															"label": "Empty"
+														},
+														"proxyKeychain": {
+															"label": "Choose a key"
+														},
+														"authenticationType": {
+															"label": "No authenticationUse when no credentials are required for the request."
+														}
+													}
+												},
+												"parameters": [
+													{
+														"name": "authenticationType",
+														"type": "select",
+														"label": "Authentication type",
+														"required": true,
+														"validate": {
+															"enum": ["noAuth", "apiKey", "basicAuth", "oAuth"]
+														}
+													},
+													{
+														"name": "tlsType",
+														"type": "select",
+														"label": "Transport layer security (TLS)",
+														"validate": {
+															"enum": ["mTls", "tls"]
+														}
+													},
+													{
+														"name": "proxyKeychain",
+														"type": "keychain:proxy",
+														"label": "Proxy"
+													}
+												],
+												"expect": [
+													{
+														"name": "url",
+														"type": "url",
+														"label": "URL",
+														"required": true
+													},
+													{
+														"name": "method",
+														"type": "select",
+														"label": "Method",
+														"required": true,
+														"validate": {
+															"enum": [
+																"get",
+																"head",
+																"post",
+																"put",
+																"patch",
+																"delete",
+																"options"
+															]
+														}
+													},
+													{
+														"name": "headers",
+														"spec": {
+															"name": "value",
+															"spec": [
+																{
+																	"name": "name",
+																	"type": "text",
+																	"label": "Name",
+																	"required": true,
+																	"validate": {
+																		"pattern": "^[-!#$%&'*+.^_`|~0-9A-Za-z]+$"
+																	}
+																},
+																{
+																	"name": "value",
+																	"type": "text",
+																	"label": "Value"
+																}
+															],
+															"type": "collection",
+															"label": "Header"
+														},
+														"type": "array",
+														"label": "Headers"
+													},
+													{
+														"name": "queryParameters",
+														"spec": {
+															"name": "value",
+															"spec": [
+																{
+																	"name": "name",
+																	"type": "text",
+																	"label": "Name",
+																	"required": true
+																},
+																{
+																	"name": "value",
+																	"type": "text",
+																	"label": "Value"
+																}
+															],
+															"type": "collection",
+															"label": "Parameter"
+														},
+														"type": "array",
+														"label": "Query parameters"
+													},
+													{
+														"name": "contentType",
+														"type": "select",
+														"label": "Body content type",
+														"validate": {
+															"enum": [
+																"json",
+																"multipart",
+																"urlEncoded",
+																"custom"
+															]
+														}
+													},
+													{
+														"name": "parseResponse",
+														"type": "boolean",
+														"label": "Parse response",
+														"required": true
+													},
+													{
+														"name": "stopOnHttpError",
+														"type": "boolean",
+														"label": "Return error if HTTP request fails",
+														"required": true
+													},
+													{
+														"name": "timeout",
+														"type": "uinteger",
+														"label": "Timeout",
+														"validate": {
+															"max": 300,
+															"min": 1
+														}
+													},
+													{
+														"name": "allowRedirects",
+														"type": "boolean",
+														"label": "Allow redirects",
+														"required": true
+													},
+													{
+														"name": "shareCookies",
+														"type": "boolean",
+														"label": "Share cookies with other HTTP modules",
+														"required": true
+													},
+													{
+														"name": "requestCompressedContent",
+														"type": "boolean",
+														"label": "Request compressed content",
+														"required": true
+													},
+													{
+														"name": "inputMethod",
+														"type": "select",
+														"label": "Body input method",
+														"required": true,
+														"validate": {
+															"enum": ["dataStructure", "jsonString"]
+														}
+													},
+													{
+														"name": "bodyDataStructure",
+														"type": "udt",
+														"label": "Body structure",
+														"required": true
+													},
+													{
+														"name": "dataStructureBodyContent",
+														"spec": [
+															{
+																"name": "inputs",
+																"type": "text",
+																"label": "Inputs",
+																"required": true
+															},
+															{
+																"name": "parameters",
+																"spec": [
+																	{
+																		"name": "min_length",
+																		"type": "number",
+																		"label": "Min length"
+																	},
+																	{
+																		"name": "max_length",
+																		"type": "number",
+																		"label": "Max length"
+																	},
+																	{
+																		"name": "do_sample",
+																		"type": "boolean",
+																		"label": "Do sample"
+																	}
+																],
+																"type": "collection",
+																"label": "Parameters"
+															},
+															{
+																"name": "options",
+																"spec": [
+																	{
+																		"name": "wait_for_model",
+																		"type": "boolean",
+																		"label": "Wait for model"
+																	}
+																],
+																"type": "collection",
+																"label": "Options"
+															}
+														],
+														"type": "collection",
+														"label": "Body content"
+													},
+													{
+														"name": "paginationType",
+														"type": "select",
+														"label": "Pagination type",
+														"validate": {
+															"enum": [
+																"offsetBased",
+																"pageBased",
+																"urlBased",
+																"tokenBased"
+															]
+														}
+													}
+												],
+												"interface": [
+													{
+														"name": "data",
+														"type": "any",
+														"label": "Data"
+													},
+													{
+														"name": "statusCode",
+														"type": "number",
+														"label": "Status Code"
+													},
+													{
+														"name": "headers",
+														"spec": [
+															{
+																"name": "content-length",
+																"type": "text",
+																"label": "Content-Length"
+															},
+															{
+																"name": "content-encoding",
+																"type": "text",
+																"label": "Content-Encoding"
+															},
+															{
+																"name": "content-type",
+																"type": "text",
+																"label": "Content-Type"
+															},
+															{
+																"name": "server",
+																"type": "text",
+																"label": "Server"
+															},
+															{
+																"name": "cache-control",
+																"type": "text",
+																"label": "Cache-Control"
+															},
+															{
+																"name": "set-cookie",
+																"spec": {
+																	"type": "text"
+																},
+																"type": "array",
+																"label": "Set-Cookie"
+															}
+														],
+														"type": "collection",
+														"label": "Headers"
+													}
+												]
+											}
+										},
+										{
+											"id": 29,
+											"module": "json:ParseJSON",
+											"version": 1,
+											"parameters": {
+												"type": ""
+											},
+											"mapper": {
+												"json": "{{28.data}}"
+											},
+											"metadata": {
+												"designer": {
+													"x": 3827,
+													"y": 747
+												},
+												"restore": {
+													"parameters": {
+														"type": {
+															"label": "Choose a data structure"
+														}
+													}
+												},
+												"parameters": [
+													{
+														"name": "type",
+														"type": "udt",
+														"label": "Data structure"
+													}
+												],
+												"expect": [
+													{
+														"name": "json",
+														"type": "text",
+														"label": "JSON string",
+														"required": true
+													}
+												]
+											}
+										},
+										{
+											"id": 30,
+											"module": "google-sheets:addRow",
+											"version": 2,
+											"parameters": {
+												"__IMTCONN__": 4020739
+											},
+											"mapper": {
+												"from": "drive",
+												"mode": "select",
+												"values": {
+													"0": "{{1.message.date}}",
+													"1": "{{1.message.from.username}}",
+													"2": "{{1.message.document.file_name}}",
+													"3": "{{1.message.document.file_size}}",
+													"4": "{{23.data.language}}",
+													"5": "{{29.summary_text}}",
+													"6": "{{23.data.keywords_str}}"
+												},
+												"sheetId": "Лист1",
+												"spreadsheetId": "/1XAr_r6eQEZpsb4AiEqNjBe-eVlhut4YcHcXkQD-LBmM",
+												"includesHeaders": true,
+												"insertDataOption": "INSERT_ROWS",
+												"valueInputOption": "USER_ENTERED",
+												"insertUnformatted": false
+											},
+											"metadata": {
+												"designer": {
+													"x": 4248,
+													"y": 742
+												},
+												"restore": {
+													"expect": {
+														"from": {
+															"label": "My Drive"
+														},
+														"mode": {
+															"label": "Search by path"
+														},
+														"sheetId": {
+															"label": "Лист1"
+														},
+														"spreadsheetId": {
+															"path": ["vk_database"]
+														},
+														"includesHeaders": {
+															"label": "Yes",
+															"nested": [
+																{
+																	"name": "values",
+																	"spec": [
+																		{
+																			"name": "0",
+																			"type": "text",
+																			"label": "timestamp (A)"
+																		},
+																		{
+																			"name": "1",
+																			"type": "text",
+																			"label": "uploader (B)"
+																		},
+																		{
+																			"name": "2",
+																			"type": "text",
+																			"label": "file_name (C)"
+																		},
+																		{
+																			"name": "3",
+																			"type": "text",
+																			"label": "file_size_bytes (D)"
+																		},
+																		{
+																			"name": "4",
+																			"type": "text",
+																			"label": "language (E)"
+																		},
+																		{
+																			"name": "5",
+																			"type": "text",
+																			"label": "summary (F)"
+																		},
+																		{
+																			"name": "6",
+																			"type": "text",
+																			"label": "keywords (G)"
+																		},
+																		{
+																			"name": "7",
+																			"type": "text",
+																			"label": "(H)"
+																		},
+																		{
+																			"name": "8",
+																			"type": "text",
+																			"label": "(I)"
+																		},
+																		{
+																			"name": "9",
+																			"type": "text",
+																			"label": "(J)"
+																		},
+																		{
+																			"name": "10",
+																			"type": "text",
+																			"label": "(K)"
+																		},
+																		{
+																			"name": "11",
+																			"type": "text",
+																			"label": "(L)"
+																		},
+																		{
+																			"name": "12",
+																			"type": "text",
+																			"label": "(M)"
+																		},
+																		{
+																			"name": "13",
+																			"type": "text",
+																			"label": "(N)"
+																		},
+																		{
+																			"name": "14",
+																			"type": "text",
+																			"label": "(O)"
+																		},
+																		{
+																			"name": "15",
+																			"type": "text",
+																			"label": "(P)"
+																		},
+																		{
+																			"name": "16",
+																			"type": "text",
+																			"label": "(Q)"
+																		},
+																		{
+																			"name": "17",
+																			"type": "text",
+																			"label": "(R)"
+																		},
+																		{
+																			"name": "18",
+																			"type": "text",
+																			"label": "(S)"
+																		},
+																		{
+																			"name": "19",
+																			"type": "text",
+																			"label": "(T)"
+																		},
+																		{
+																			"name": "20",
+																			"type": "text",
+																			"label": "(U)"
+																		},
+																		{
+																			"name": "21",
+																			"type": "text",
+																			"label": "(V)"
+																		},
+																		{
+																			"name": "22",
+																			"type": "text",
+																			"label": "(W)"
+																		},
+																		{
+																			"name": "23",
+																			"type": "text",
+																			"label": "(X)"
+																		},
+																		{
+																			"name": "24",
+																			"type": "text",
+																			"label": "(Y)"
+																		},
+																		{
+																			"name": "25",
+																			"type": "text",
+																			"label": "(Z)"
+																		},
+																		{
+																			"name": "26",
+																			"type": "text",
+																			"label": "(AA)"
+																		},
+																		{
+																			"name": "27",
+																			"type": "text",
+																			"label": "(AB)"
+																		},
+																		{
+																			"name": "28",
+																			"type": "text",
+																			"label": "(AC)"
+																		}
+																	],
+																	"type": "collection",
+																	"label": "Values"
+																}
+															]
+														},
+														"insertDataOption": {
+															"mode": "chose",
+															"label": "Insert rows"
+														},
+														"valueInputOption": {
+															"mode": "chose",
+															"label": "User entered"
+														},
+														"insertUnformatted": {
+															"mode": "chose"
+														}
+													},
+													"parameters": {
+														"__IMTCONN__": {
+															"data": {
+																"scoped": "true",
+																"connection": "google"
+															},
+															"label": "My Google connection (alexbarkova9@gmail.com)"
+														}
+													}
+												},
+												"parameters": [
+													{
+														"name": "__IMTCONN__",
+														"type": "account:google",
+														"label": "Connection",
+														"required": true
+													}
+												],
+												"expect": [
+													{
+														"name": "mode",
+														"type": "select",
+														"label": "Search Method",
+														"required": true,
+														"validate": {
+															"enum": ["select", "fromAll", "map"]
+														}
+													},
+													{
+														"name": "insertUnformatted",
+														"type": "boolean",
+														"label": "Unformatted",
+														"required": true
+													},
+													{
+														"name": "valueInputOption",
+														"type": "select",
+														"label": "Value input option",
+														"validate": {
+															"enum": ["USER_ENTERED", "RAW"]
+														}
+													},
+													{
+														"name": "insertDataOption",
+														"type": "select",
+														"label": "Insert data option",
+														"validate": {
+															"enum": ["INSERT_ROWS", "OVERWRITE"]
+														}
+													},
+													{
+														"name": "from",
+														"type": "select",
+														"label": "Drive",
+														"required": true,
+														"validate": {
+															"enum": ["drive", "share", "team"]
+														}
+													},
+													{
+														"name": "spreadsheetId",
+														"type": "file",
+														"label": "Spreadsheet ID",
+														"required": true
+													},
+													{
+														"name": "sheetId",
+														"type": "select",
+														"label": "Sheet Name",
+														"required": true
+													},
+													{
+														"name": "includesHeaders",
+														"type": "select",
+														"label": "Table contains headers",
+														"required": true,
+														"validate": {
+															"enum": [true, false]
+														}
+													},
+													{
+														"name": "values",
+														"spec": [
+															{
+																"name": "0",
+																"type": "text",
+																"label": "timestamp (A)"
+															},
+															{
+																"name": "1",
+																"type": "text",
+																"label": "uploader (B)"
+															},
+															{
+																"name": "2",
+																"type": "text",
+																"label": "file_name (C)"
+															},
+															{
+																"name": "3",
+																"type": "text",
+																"label": "file_size_bytes (D)"
+															},
+															{
+																"name": "4",
+																"type": "text",
+																"label": "language (E)"
+															},
+															{
+																"name": "5",
+																"type": "text",
+																"label": "summary (F)"
+															},
+															{
+																"name": "6",
+																"type": "text",
+																"label": "keywords (G)"
+															},
+															{
+																"name": "7",
+																"type": "text",
+																"label": "(H)"
+															},
+															{
+																"name": "8",
+																"type": "text",
+																"label": "(I)"
+															},
+															{
+																"name": "9",
+																"type": "text",
+																"label": "(J)"
+															},
+															{
+																"name": "10",
+																"type": "text",
+																"label": "(K)"
+															},
+															{
+																"name": "11",
+																"type": "text",
+																"label": "(L)"
+															},
+															{
+																"name": "12",
+																"type": "text",
+																"label": "(M)"
+															},
+															{
+																"name": "13",
+																"type": "text",
+																"label": "(N)"
+															},
+															{
+																"name": "14",
+																"type": "text",
+																"label": "(O)"
+															},
+															{
+																"name": "15",
+																"type": "text",
+																"label": "(P)"
+															},
+															{
+																"name": "16",
+																"type": "text",
+																"label": "(Q)"
+															},
+															{
+																"name": "17",
+																"type": "text",
+																"label": "(R)"
+															},
+															{
+																"name": "18",
+																"type": "text",
+																"label": "(S)"
+															},
+															{
+																"name": "19",
+																"type": "text",
+																"label": "(T)"
+															},
+															{
+																"name": "20",
+																"type": "text",
+																"label": "(U)"
+															},
+															{
+																"name": "21",
+																"type": "text",
+																"label": "(V)"
+															},
+															{
+																"name": "22",
+																"type": "text",
+																"label": "(W)"
+															},
+															{
+																"name": "23",
+																"type": "text",
+																"label": "(X)"
+															},
+															{
+																"name": "24",
+																"type": "text",
+																"label": "(Y)"
+															},
+															{
+																"name": "25",
+																"type": "text",
+																"label": "(Z)"
+															},
+															{
+																"name": "26",
+																"type": "text",
+																"label": "(AA)"
+															},
+															{
+																"name": "27",
+																"type": "text",
+																"label": "(AB)"
+															},
+															{
+																"name": "28",
+																"type": "text",
+																"label": "(AC)"
+															}
+														],
+														"type": "collection",
+														"label": "Values"
+													}
+												]
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	],
+	"metadata": {
+		"instant": true,
+		"version": 1,
+		"scenario": {
+			"roundtrips": 1,
+			"maxErrors": 3,
+			"autoCommit": true,
+			"autoCommitTriggerLast": true,
+			"sequential": false,
+			"slots": null,
+			"confidential": false,
+			"dataloss": false,
+			"dlq": false,
+			"freshVariables": false
+		},
+		"designer": {
+			"orphans": []
+		},
+		"zone": "eu1.make.com",
+		"notes": []
+	}
+}
