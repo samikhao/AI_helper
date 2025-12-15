@@ -1,7 +1,7 @@
 # ИИ-помогатор для баз знаний
 
 Ссылка на таблицу:
-[Результаты обработки документов](https://docs.google.com/spreadsheets/d/1XAr_r6eQEZpsb4AiEqNjBe-eVlhut4YcHcXkQD-LBmM/edit?usp=sharing)
+[Результаты обработки документов](https://docs.google.com/spreadsheets/d/1XAr_r6eQEZpsb4AiEqNjBe-eVlhut4YcHcXkQD-LBmM/edit?usp=sharing).
 
 В формате PDF -- `images/results.pdf`.
 
